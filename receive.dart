@@ -68,6 +68,7 @@ class _MyAppState extends State<ReceiveApp> {
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         print('on message $message');
+        await alertMessage();
         setState(() async {
           await Firestore.instance.collection('01').document(_email).get().then((data) {
             final cell = Cell.fromSnapshot(data);
@@ -707,6 +708,26 @@ class _MyAppState extends State<ReceiveApp> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("성공적으로 처리되었습니다."),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('네'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> alertMessage() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("접근이 승인되었습니다. 이 팝업창을 닫은 후 새로고침을 눌러주세요."),
           actions: <Widget>[
             FlatButton(
               child: Text('네'),
