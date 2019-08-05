@@ -30,11 +30,6 @@ class _MyAppState extends State<ReceiveApp> {
   String _email = "temporary10@pdsample.com"; // 계정 이름
   bool _isLoading = false;
 
-  bool step1 = false;
-  bool step2 = false;
-  bool step3 = false;
-  bool step4 = false;
-
   bool confirm1 = false;
   bool confirm2 = false;
   bool confirm3 = false;
@@ -46,6 +41,10 @@ class _MyAppState extends State<ReceiveApp> {
   Location location;
 
   SharedPreferences prefs;
+
+  Map<String, dynamic> info;
+
+  Widget circle = Center(child: CircularProgressIndicator());
 
 
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
@@ -64,6 +63,11 @@ class _MyAppState extends State<ReceiveApp> {
 
   void currentUser() async {
     prefs = await SharedPreferences.getInstance();
+    await _user().then((data) {
+      setState(() {
+        info = data['bus_info'];
+      });
+    });
   }
 
   @override
@@ -146,7 +150,6 @@ class _MyAppState extends State<ReceiveApp> {
       if (confirm2) {
         setState(() {
           confirm1 = true;
-          step1 = step2 = step3 = step4 = false;
         });
       }
     });
@@ -164,6 +167,21 @@ class _MyAppState extends State<ReceiveApp> {
             .update(cell.reference, {'long': double.parse(latlng[1])});
       });
     });
+  }
+
+  Future<Init> status(String _token, String _status) async {
+    final response = await http.post (
+      "https://ip2019.tk/guide/api/status",
+      body: json.encode({
+        "token" : _token,
+        "status": _status,
+      }),
+      headers: {
+        "content-type" : "application/json",
+        "accept" : "application/json",
+      },
+    );
+    return Init.fromJson(json.decode(response.body));
   }
 
   void logout() async {
@@ -224,6 +242,13 @@ class _MyAppState extends State<ReceiveApp> {
     return json.decode(utf8.decode(response.bodyBytes));
   }
 
+  Widget _showCircularProgress() {
+    if (_isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+    return Container(height: 0.0, width: 0.0,);
+  }
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -249,7 +274,8 @@ class _MyAppState extends State<ReceiveApp> {
       body: Stack(
         children: <Widget>[
           _showBody(),
-          _showCircularProgress(),
+          _showCircularProgress()
+
         ],
       ),
       drawer: Drawer(
@@ -259,7 +285,7 @@ class _MyAppState extends State<ReceiveApp> {
         child: FutureBuilder<Map<String, dynamic>> (
           future: _user(),
           builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
-            if (snapshot.hasData && snapshot.data != null) {
+            if (snapshot.hasData && snapshot.data != null && snapshot.data['ok']) {
               return new ListView(
                 // Important: Remove any padding from the ListView.
                 padding: EdgeInsets.zero,
@@ -597,27 +623,142 @@ class _MyAppState extends State<ReceiveApp> {
     );
   }
 
-  Widget _showCircularProgress() {
-    if (_isLoading) {
-      return Center(child: CircularProgressIndicator());
-    } return Container(height: 0.0, width: 0.0,);
-  }
-
   Widget _showBody(){
     return new Container(
-      padding: EdgeInsets.all(16.0),
+      padding: EdgeInsets.zero,
       child: new ListView(
         shrinkWrap: true,
         children: <Widget>[
-          Text(_commitDate + " 오후", style: TextStyle(fontSize: 14),),
+          Container(
+            padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+            child: Text(_commitDate + " 오후", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green[900]), ),
+          ),
+          (info != null) ? Container(
+        padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: Text(info['bus_name'] + "/" + "차량1" + "/" + info['bus_guide_name'] + "/" + info['bus_guide_phone'], style: TextStyle(fontSize: 13.0),),
+            ),
+            Container(
+              alignment: Alignment.centerRight,
+              child: ButtonTheme(
+                minWidth: 10.0,
+                child: RaisedButton(
+                  padding: EdgeInsets.zero,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  color: Colors.green[900],
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => EditProfile(this)),
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(10.0),
+                    child: Text("수정", style: TextStyle(fontSize: 10.0, color: Colors.white,),),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ) : Container(),
+          (info != null) ? Container(
+            color: Colors.grey[100],
+            padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text("버스정보 : " + info['bus_number'] + " (" + info['bus_driver_phone'] + ")", style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),),
+                ),
+                Container(
+                  alignment: Alignment.centerRight,
+                  child: ButtonTheme(
+                    minWidth: 10.0,
+                    child: RaisedButton(
+                      padding: EdgeInsets.zero,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      color: Colors.green[900],
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => EditBus(this)),
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text("수정", style: TextStyle(fontSize: 10.0, color: Colors.white,),),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ) : Container(),
+          (info != null) ? Container(
+            padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text("주차장(터미널) 정보", style: TextStyle(fontSize: 14.0,),),
+                ),
+                Expanded(
+                  child: Text("제1관 터미널", style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.pink),),
+                ),
+                Container(
+                  alignment: Alignment.centerRight,
+                  child: ButtonTheme(
+                    minWidth: 10.0,
+                    child: RaisedButton(
+                      padding: EdgeInsets.zero,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      color: Colors.blue,
+                      onPressed: () async {
+                        String url;
+                        if (Platform.isAndroid) {
+                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                          if (await canLaunch(url)) {
+                            await launch(
+                              url,
+                              forceSafariVC: true,
+                              forceWebView: true,
+                              enableJavaScript: true,
+                            );
+                          }
+                        } else {
+                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                          try {
+                            await launch(
+                              url,
+                              forceSafariVC: true,
+                              forceWebView: true,
+                              enableJavaScript: true,
+                            );
+                          } catch (e) {
+                            print(e.toString());
+                          }
+                        }
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text("지도", style: TextStyle(fontSize: 10.0, color: Colors.white,),),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ) : Container(),
+          Container(
+            color: Colors.grey[100],
+            padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+            child: Text("버스 이용 확인", style: TextStyle(fontWeight: FontWeight.bold,),),
+          ),
           depart(),
-          departDetail(),
           arrive(),
-          arriveDetail(),
           terminalArrive(),
-          terminalArriveDetail(),
           terminalDepart(),
-          terminalDepartDetail(),
           finish(),
         ],
       ),
@@ -625,131 +766,52 @@ class _MyAppState extends State<ReceiveApp> {
   }
 
   Widget depart() {
-    return ListTile(
-      title: Text("출발 요청"),
-      onTap: () {
-        setState(() {
-          step1 = !step1;
-          step2 = step3 = step4 = false;
-        });
-      },
-      trailing: confirm1 ? Icon(Icons.check_circle, color: Colors.green) : (step1 ? Icon(Icons.arrow_drop_up) : Icon(Icons.arrow_drop_down)),
-    );
-  }
-
-  Widget departDetail() {
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 200),
-      height: step1 ? 50 : 0,
-      child: step1 ? MaterialButton (
-        elevation: 5.0,
-        minWidth: 10.0,
-        height: 42.0,
-        color: Colors.blue,
-        child:new Text('출발 요청',
-            style: new TextStyle(fontSize: 20.0, color: Colors.white)),
-        onPressed: () {
-          !confirm1 ? alert("버스 출발을 요청하시겠습니까?", 1) : alert("버스 출발 요청을 취소하겠습니까??", 6);
+    return Container(
+      color: !confirm1 ? Colors.grey[100] : Colors.orange[200],
+      child: ListTile(
+        title: Text("준비 완료, 출발 요청", textAlign: TextAlign.center,),
+        onTap: () {
+          setState(() {
+            !confirm1 ? alert("버스 출발을 요청하시겠습니까?", 1) : alert("버스 출발 요청을 취소하겠습니까??", 6);
+          });
         },
-      ) : null,
-      color: Colors.grey,
+      ),
     );
   }
 
   Widget arrive() {
-    return ListTile(
-      title: Text("출발 준비"),
+    return Container(
+        color: !confirm2 ? Colors.grey[100] : Colors.orange[700],
+        child: ListTile(
+      title: Text("요청 승인, 위치 확인", textAlign: TextAlign.center,),
       onTap: () {
-        setState(() {
-          step2 = !step2;
-          step1 = step3 = step4 = false;
-        });
+        !confirm2 ? alert("관제팀에서 터미널 접근을 승인하지 않았습니다. 새로고침을 눌러 다시 확인해주세요.", 4) : alert("터미널 접근이 승인되었습니다.", 9);
       },
-      trailing: confirm2 ? Icon(Icons.check_circle, color: Colors.green) : (step2 ? Icon(Icons.arrow_drop_up) : Icon(Icons.arrow_drop_down)),
-    );
-  }
-
-  Widget arriveDetail() {
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 200),
-      height: step2 ? 50 : 0,
-      child: step2 ?
-      MaterialButton (
-        elevation: 5.0,
-        minWidth: 10.0,
-        height: 42.0,
-        color: Colors.blue,
-        child:new Text('출발 준비',
-            style: new TextStyle(fontSize: 20.0, color: Colors.white)),
-        onPressed: () {
-          !confirm2 ? alert("관제팀에서 터미널 접근을 승인하지 않았습니다. 새로고침을 눌러 다시 확인해주세요.", 4) : alert("터미널 접근이 승인되었습니다.", 9);
-        },
-      ) : null,
-      color: Colors.grey,
+        ),
     );
   }
 
   Widget terminalArrive() {
-    return confirm2 ? ListTile(
-      title: Text("터미널도착"),
+    return Container(
+        color: !confirm3 ? Colors.grey[100] : Colors.orange[200],
+        child: ListTile(
+      title: Text("터미널도착", textAlign: TextAlign.center,),
       onTap: () {
-        setState(() {
-          step3 = !step3;
-          step1 = step2 = step4 = false;
-        });
+        !confirm3 ? alert("버스가 터미널에 정차하였습니까?", 2) : alert("버스가 아직 터미널에 정차하지 않았습니까?", 7);
       },
-      trailing: confirm3 ? Icon(Icons.check_circle, color: Colors.green) : (step3 ? Icon(Icons.arrow_drop_up) : Icon(Icons.arrow_drop_down)),
-    ) : ListTile();
-  }
-
-  Widget terminalArriveDetail() {
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 200),
-      height: step3 ? 50 : 0,
-      child: step3 ? MaterialButton (
-        elevation: 5.0,
-        minWidth: 10.0,
-        height: 42.0,
-        color: Colors.blue,
-        child:new Text('터미널도착',
-            style: new TextStyle(fontSize: 20.0, color: Colors.white)),
-        onPressed: () {
-          !confirm3 ? alert("버스가 터미널에 정차하였습니까?", 2) : alert("버스가 아직 터미널에 정차하지 않았습니까?", 7);
-        },
-      ) : null,
-      color: Colors.grey,
+        ),
     );
   }
 
   Widget terminalDepart() {
-    return confirm2 ? ListTile(
-      title: Text("터미널출발"),
+    return Container(
+        color: !confirm4 ? Colors.grey[100] : Colors.orange[200],
+        child: ListTile(
+      title: Text("터미널출발", textAlign: TextAlign.center,),
       onTap: () {
-        setState(() {
-          step4 = !step4;
-          step1 = step2 = step3 = false;
-        });
+        !confirm4 ? alert("버스 승객이 모두 승차하였고, 버스가 터미널을 빠져나왔습니까?", 3) : alert("버스가 아직 터미널을 출발하지 않았습니까?", 8);
       },
-      trailing: confirm4 ? Icon(Icons.check_circle, color: Colors.green) : (step4 ? Icon(Icons.arrow_drop_up) : Icon(Icons.arrow_drop_down)),
-    ) : ListTile();
-  }
-
-  Widget terminalDepartDetail() {
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 200),
-      height: step4 ? 50 : 0,
-      child: step4 ? MaterialButton (
-        elevation: 5.0,
-        minWidth: 10.0,
-        height: 42.0,
-        color: Colors.blue,
-        child:new Text('터미널출발',
-            style: new TextStyle(fontSize: 20.0, color: Colors.white)),
-        onPressed: () {
-          !confirm4 ? alert("버스 승객이 모두 승차하였고, 버스가 터미널을 빠져나왔습니까?", 3) : alert("버스가 아직 터미널을 출발하지 않았습니까?", 8);
-        },
-      ) : null,
-      color: Colors.grey,
+        ),
     );
   }
 
@@ -825,12 +887,13 @@ class _MyAppState extends State<ReceiveApp> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("접근이 승인되었습니다. 이 팝업창을 닫은 후 새로고침을 눌러주세요."),
+          title: Text("접근이 승인되었습니다"),
           actions: <Widget>[
             FlatButton(
               child: Text('네'),
               onPressed: () {
                 Navigator.of(context).pop();
+                getEmail();
               },
             ),
           ],
@@ -857,11 +920,20 @@ class _MyAppState extends State<ReceiveApp> {
               child: Text('네'),
               onPressed: () {
                 Navigator.of(context).pop();
+                setState(() {
+                  _isLoading = true;
+                });
                 switch (process) {
                   case 1:
-                    setState(() {
-                      _isLoading = true;
-                    });
+                    /*status(prefs.getString("token"), "start").then((post) {
+                      if (post.ok) {
+                        setState(() {
+                          confirm1 = true;
+                          _isLoading = false;
+                        });
+                        success();
+                      }
+                    });*/
                     Firestore.instance.collection('01')
                         .document(_email)
                         .updateData(<String, dynamic>{'depart': (DateTime.now().hour < 10 ? "0" + DateTime.now().hour.toString() : DateTime.now().hour.toString()) + ":" + (DateTime.now().minute < 10 ? "0" + DateTime.now().minute.toString() : DateTime.now().minute.toString())})
@@ -874,9 +946,6 @@ class _MyAppState extends State<ReceiveApp> {
                     });
                     break;
                   case 2:
-                    setState(() {
-                      _isLoading = true;
-                    });
                     if (confirm2) {
                       Firestore.instance.collection('01')
                           .document(_email)
@@ -893,9 +962,6 @@ class _MyAppState extends State<ReceiveApp> {
                     }
                     break;
                   case 3:
-                    setState(() {
-                      _isLoading = true;
-                    });
                     if (confirm3) {
                       Firestore.instance.collection('01')
                           .document(_email)
@@ -912,9 +978,6 @@ class _MyAppState extends State<ReceiveApp> {
                     }
                     break;
                   case 6:
-                    setState(() {
-                      _isLoading = true;
-                    });
                     if (!confirm2) {
                       Firestore.instance.collection('01')
                           .document(_email)
@@ -930,9 +993,6 @@ class _MyAppState extends State<ReceiveApp> {
                     }
                     break;
                   case 7:
-                    setState(() {
-                      _isLoading = true;
-                    });
                     if (!confirm4) {
                       Firestore.instance.collection('01')
                           .document(_email)
@@ -948,9 +1008,6 @@ class _MyAppState extends State<ReceiveApp> {
                     }
                     break;
                   case 8:
-                    setState(() {
-                      _isLoading = true;
-                    });
                     Firestore.instance.collection('01')
                         .document(_email)
                         .updateData(<String, dynamic>{'tDepart': null}).then((a) {
@@ -964,10 +1021,579 @@ class _MyAppState extends State<ReceiveApp> {
                   default:
                     break;
                 }
-                setState(() {
-                  step1 = step2 = step3 = step4 = false;
-                });
                 // 데이터 전송
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class EditProfile extends StatefulWidget {
+  _MyAppState parent;
+
+  EditProfile(this.parent);
+
+  @override
+  createState() => new Edit(this.parent);
+}
+
+class Edit extends State<EditProfile> {
+  final _formKey = new GlobalKey<FormState>();
+  String _guideName;
+  final controller1 = TextEditingController();
+  String _guideNumber;
+  final controller2 = TextEditingController();
+  String _busCode;
+  final controller3 = TextEditingController();
+  String _busNumber;
+  final controller4 = TextEditingController();
+  SharedPreferences prefs;
+
+  Timeline _timeline = (new DateTime.now().hour < 12) ? Timeline.morning : Timeline.afternoon;
+  String _commitDate = DateTime.now().day % 3 == 1 ? '첫째날(금) 09-13': (DateTime.now().day % 3 == 2 ? '둘째날(토) 09-14': '셋째날(일) 09-15');
+
+  void currentUser() async {
+    prefs = await SharedPreferences.getInstance();
+    await _user().then((data) {
+      if (data['ok']) {
+        controller1.text = data['bus_info']['bus_guide_name'];
+        controller2.text = data['bus_info']['bus_guide_phone'];
+        _busCode = data['bus_info']['bus_number'];
+        _busNumber = data['bus_info']['bus_driver_phone'];
+//        controller3.text = data['bus_info']['bus_number'];
+//        controller4.text = data['bus_info']['bus_driver_phone'];
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    currentUser();
+  }
+
+  _MyAppState parent;
+
+  Edit(this.parent);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: '초기값 입력',
+      theme: ThemeData(
+        primaryColor: Colors.green[900],
+        bottomAppBarColor: Colors.grey[300],
+      ),
+      home: Scaffold(
+        appBar: AppBar(
+          leading: new IconButton(
+            icon: new Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          title: Text('2019SIC 주차 지원', style: TextStyle(fontWeight: FontWeight.bold,),),
+        ),
+        body: Container(
+          alignment: Alignment.center,
+          padding: EdgeInsets.all(20.0),
+          decoration: BoxDecoration(
+            image: DecorationImage(image: AssetImage("assets/jwmain.png"), fit: BoxFit.cover),
+          ),
+          child: Stack(
+            children: <Widget>[
+              _showBody(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _showBody() {
+    return new Container(
+      padding: EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        backgroundBlendMode: BlendMode.softLight,
+        color: Colors.white,
+      ),
+      child: new Form(
+        key: _formKey,
+        child: new ListView(
+          shrinkWrap: true,
+          children: <Widget>[
+            Text("입력값 수정", textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.green[900], fontSize: 20.0, fontWeight: FontWeight.bold)
+            ),
+            _guideNameInput(),
+            _busDriverInput(),
+//            _busCodeInput(),
+//            _memo(),
+            _submit(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _guideNameInput() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      child: new TextFormField(
+        controller: controller1,
+        maxLines: 1,
+        keyboardType: TextInputType.text,
+        autofocus: true,
+        decoration: new InputDecoration(
+          labelText: '인솔자 이름',
+        ),
+        validator: (value) => value.isEmpty ? '값을 입력하세요.' : null,
+        onSaved: (value) => _guideName = value,
+      ),
+    );
+  }
+
+  Widget _busDriverInput() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      child: new TextFormField(
+        controller: controller2,
+        maxLines: 1,
+        keyboardType: TextInputType.phone,
+        autofocus: true,
+        decoration: new InputDecoration(
+          labelText: '인솔자 전화번호',
+        ),
+        validator: (value) => value.isEmpty ? '값을 입력하세요.' : null,
+        onSaved: (value) => _guideNumber = value,
+      ),
+    );
+  }
+
+//  Widget _busCodeInput() {
+//    return Padding(
+//      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+//      child: new TextFormField(
+//        controller: controller3,
+//        maxLines: 1,
+//        keyboardType: TextInputType.text,
+//        autofocus: false,
+//        decoration: new InputDecoration(
+//          labelText: '차량 번호 (예: 12가 3456)',
+//        ),
+//        validator: (value) => value.isEmpty ? '값을 입력하세요.' : null,
+//        onSaved: (value) => _busCode = value,
+//      ),
+//    );
+//  }
+//
+//  Widget _memo() {
+//    return Padding(
+//      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+//      child: new TextFormField(
+//        controller: controller4,
+//        maxLines: 1,
+//        keyboardType: TextInputType.phone,
+//        autofocus: false,
+//        decoration: new InputDecoration(
+//          labelText: '기사 연락처',
+//        ),
+//        validator: (value) => value.isEmpty ? '값을 입력하세요.' : null,
+//        onSaved: (value) => _busNumber = value,
+//      ),
+//    );
+//  }
+
+  Widget _submit() {
+    return new Padding(
+      padding: EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0),
+      child: RaisedButton(
+        color: Colors.green[900],
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        onPressed: () {
+          confirm("인솔자 이름:"+ controller1.text + "\n\n" + "인솔자 전화번호:"+ controller2.text + /*"\n\n" +  "차량 번호:"+ controller3.text + "\n\n" + "기사 연락처:"+ controller4.text + */ "\n\n" + "위 정보가 맞습니까?");
+        },
+        child: new Text('확인',
+            style: new TextStyle(fontSize: 20.0, color: Colors.white)),
+      ),
+    );
+  }
+
+  Future<Map<String, dynamic>> _user() async {
+    prefs = await SharedPreferences.getInstance();
+    final response = await http.get (
+      "https://ip2019.tk/guide/api?token=" + prefs.getString("token"),
+      headers: {
+        "content-type" : "application/json",
+        "accept" : "application/json",
+      },
+    );
+    return json.decode(utf8.decode(response.bodyBytes));
+  }
+
+  Future<Init> fetchPost(String _token, String _guideName, String _guideNumber, String _busCode, String _busNumber) async {
+    final response = await http.post (
+      "https://ip2019.tk/guide/api/info",
+      body: json.encode({
+        "token" : _token,
+        "bus_guide_name": _guideName,
+        "bus_guide_phone": _guideNumber,
+        "bus_number": _busCode,
+        "bus_driver_phone": _busNumber,
+        "bus_day": 0, /// 매일 바뀌어야 함
+      }),
+      headers: {
+        "content-type" : "application/json",
+        "accept" : "application/json",
+      },
+    );
+    return Init.fromJson(json.decode(response.body));
+  }
+
+  void _validateAndSubmit() async {
+    final form = _formKey.currentState;
+    if (form.validate()) {
+      form.save();
+
+      await fetchPost(prefs.getString('token'), _guideName, _guideNumber, _busCode, _busNumber).then((post) async {
+        if (post.ok) {
+          this.parent.currentUser();
+          Navigator.of(context).pop();
+        } else {
+          await alert(post.reason != null ? post.reason : "관리자 문의");
+        }
+      }).catchError((e) async {
+        print(e.toString());
+        await alert("네트워크를 확인해주세요.");
+      });
+    }
+  }
+
+  Future<void> alert(String message) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(message),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('네'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> confirm(String message) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(message),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('아니오'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('네'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _validateAndSubmit();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class EditBus extends StatefulWidget {
+  _MyAppState parent;
+
+  EditBus(this.parent);
+
+  @override
+  createState() => new EditB(this.parent);
+}
+
+class EditB extends State<EditBus> {
+  final _formKey = new GlobalKey<FormState>();
+  String _guideName;
+  final controller1 = TextEditingController();
+  String _guideNumber;
+  final controller2 = TextEditingController();
+  String _busCode;
+  final controller3 = TextEditingController();
+  String _busNumber;
+  final controller4 = TextEditingController();
+  SharedPreferences prefs;
+
+  Timeline _timeline = (new DateTime.now().hour < 12) ? Timeline.morning : Timeline.afternoon;
+  String _commitDate = DateTime.now().day % 3 == 1 ? '첫째날(금) 09-13': (DateTime.now().day % 3 == 2 ? '둘째날(토) 09-14': '셋째날(일) 09-15');
+
+  void currentUser() async {
+    prefs = await SharedPreferences.getInstance();
+    await _user().then((data) {
+      if (data['ok']) {
+        _guideName = data['bus_info']['bus_guide_name'];
+        _guideNumber = data['bus_info']['bus_guide_phone'];
+        controller3.text = data['bus_info']['bus_number'];
+        controller4.text = data['bus_info']['bus_driver_phone'];
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    currentUser();
+  }
+
+  _MyAppState parent;
+
+  EditB(this.parent);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: '초기값 입력',
+      theme: ThemeData(
+        primaryColor: Colors.green[900],
+        bottomAppBarColor: Colors.grey[300],
+      ),
+      home: Scaffold(
+        appBar: AppBar(
+          leading: new IconButton(
+            icon: new Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          title: Text('2019SIC 주차 지원', style: TextStyle(fontWeight: FontWeight.bold,),),
+        ),
+        body: Container(
+          alignment: Alignment.center,
+          padding: EdgeInsets.all(20.0),
+          decoration: BoxDecoration(
+            image: DecorationImage(image: AssetImage("assets/jwmain.png"), fit: BoxFit.cover),
+          ),
+          child: Stack(
+            children: <Widget>[
+              _showBody(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _showBody() {
+    return new Container(
+      padding: EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        backgroundBlendMode: BlendMode.softLight,
+        color: Colors.white,
+      ),
+      child: new Form(
+        key: _formKey,
+        child: new ListView(
+          shrinkWrap: true,
+          children: <Widget>[
+            Text("입력값 수정", textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.green[900], fontSize: 20.0, fontWeight: FontWeight.bold)
+            ),
+//            _guideNameInput(),
+//            _busDriverInput(),
+            _busCodeInput(),
+            _memo(),
+            _submit(),
+          ],
+        ),
+      ),
+    );
+  }
+//
+//  Widget _guideNameInput() {
+//    return Padding(
+//      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+//      child: new TextFormField(
+//        controller: controller1,
+//        maxLines: 1,
+//        keyboardType: TextInputType.text,
+//        autofocus: true,
+//        decoration: new InputDecoration(
+//          labelText: '인솔자 이름',
+//        ),
+//        validator: (value) => value.isEmpty ? '값을 입력하세요.' : null,
+//        onSaved: (value) => _guideName = value,
+//      ),
+//    );
+//  }
+//
+//  Widget _busDriverInput() {
+//    return Padding(
+//      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+//      child: new TextFormField(
+//        controller: controller2,
+//        maxLines: 1,
+//        keyboardType: TextInputType.phone,
+//        autofocus: true,
+//        decoration: new InputDecoration(
+//          labelText: '인솔자 전화번호',
+//        ),
+//        validator: (value) => value.isEmpty ? '값을 입력하세요.' : null,
+//        onSaved: (value) => _guideNumber = value,
+//      ),
+//    );
+//  }
+
+  Widget _busCodeInput() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      child: new TextFormField(
+        controller: controller3,
+        maxLines: 1,
+        keyboardType: TextInputType.text,
+        autofocus: false,
+        decoration: new InputDecoration(
+          labelText: '차량 번호 (예: 12가 3456)',
+        ),
+        validator: (value) => value.isEmpty ? '값을 입력하세요.' : null,
+        onSaved: (value) => _busCode = value,
+      ),
+    );
+  }
+
+  Widget _memo() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      child: new TextFormField(
+        controller: controller4,
+        maxLines: 1,
+        keyboardType: TextInputType.phone,
+        autofocus: false,
+        decoration: new InputDecoration(
+          labelText: '기사 연락처',
+        ),
+        validator: (value) => value.isEmpty ? '값을 입력하세요.' : null,
+        onSaved: (value) => _busNumber = value,
+      ),
+    );
+  }
+
+  Widget _submit() {
+    return new Padding(
+      padding: EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0),
+      child: RaisedButton(
+        color: Colors.green[900],
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        onPressed: () {
+          confirm(/*"인솔자 이름:"+ controller1.text + "\n\n" + "인솔자 전화번호:"+ controller2.text + "\n\n" +  */"차량 번호:"+ controller3.text + "\n\n" + "기사 연락처:"+ controller4.text +  "\n\n" + "위 정보가 맞습니까?");
+        },
+        child: new Text('확인',
+            style: new TextStyle(fontSize: 20.0, color: Colors.white)),
+      ),
+    );
+  }
+
+  Future<Map<String, dynamic>> _user() async {
+    prefs = await SharedPreferences.getInstance();
+    final response = await http.get (
+      "https://ip2019.tk/guide/api?token=" + prefs.getString("token"),
+      headers: {
+        "content-type" : "application/json",
+        "accept" : "application/json",
+      },
+    );
+    return json.decode(utf8.decode(response.bodyBytes));
+  }
+
+  Future<Init> fetchPost(String _token, String _guideName, String _guideNumber, String _busCode, String _busNumber) async {
+    final response = await http.post (
+      "https://ip2019.tk/guide/api/info",
+      body: json.encode({
+        "token" : _token,
+        "bus_guide_name": _guideName,
+        "bus_guide_phone": _guideNumber,
+        "bus_number": _busCode,
+        "bus_driver_phone": _busNumber,
+        "bus_day": 0, /// 매일 바뀌어야 함
+      }),
+      headers: {
+        "content-type" : "application/json",
+        "accept" : "application/json",
+      },
+    );
+    return Init.fromJson(json.decode(response.body));
+  }
+
+  void _validateAndSubmit() async {
+    final form = _formKey.currentState;
+    if (form.validate()) {
+      form.save();
+
+      await fetchPost(prefs.getString('token'), _guideName, _guideNumber, _busCode, _busNumber).then((post) async {
+        if (post.ok) {
+          this.parent.currentUser();
+          Navigator.of(context).pop();
+        } else {
+          await alert(post.reason != null ? post.reason : "관리자 문의");
+        }
+      }).catchError((e) async {
+        print(e.toString());
+        await alert("네트워크를 확인해주세요.");
+      });
+    }
+  }
+
+  Future<void> alert(String message) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(message),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('네'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> confirm(String message) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(message),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('아니오'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('네'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _validateAndSubmit();
               },
             ),
           ],

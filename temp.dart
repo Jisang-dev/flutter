@@ -6,6 +6,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:pdsample/init.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pdsample/main.dart';
 
 enum FormMode { LOGIN, SIGNUP }
 
@@ -216,6 +217,9 @@ class _MyHomePageState extends State<TempPage> {
         );
       } else {
         alert("비밀번호가 일치한지 확인해주세요.");
+        setState(() {
+          _isLoading = false;
+        });
       }
 //      await fetchPost(_email, _password).then((post) async {
 //        if (post.ok) {
