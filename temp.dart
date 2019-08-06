@@ -8,13 +8,11 @@ import 'package:pdsample/init.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pdsample/main.dart';
 
-enum FormMode { LOGIN, SIGNUP }
-
-Future<Post> fetchPost(String id, String pw) async {
+  Future<Post> fetchPost(String token, String pw) async {
   final response = await http.post (
-    "https://ip2019.tk/auth/api",
+  "https://ip2019.tk/auth/api/password_change",
     body: json.encode({
-      "name": id,
+      "token": token,
       "password": pw,
     }),
     headers: {
@@ -32,15 +30,7 @@ class TempApp extends StatelessWidget {
     return new MaterialApp(
       title: '2019 국제대회 주차부',
       theme: new ThemeData(
-// This is the theme of your application.
-//
-// Try running your application with "flutter run". You'll see the
-// application has a blue toolbar. Then, without quitting the app, try
-// changing the primarySwatch below to Colors.green and then invoke
-// "hot reload" (press "r" in the console where you ran "flutter run",
-// or press Run > Flutter Hot Reload in IntelliJ). Notice that the
-// counter didn't reset back to zero; the application is not restarted.
-        primarySwatch: Colors.green,
+        primaryColor: Colors.green[900],
       ),
       home: new TempPage(title: '주차부 버스 인솔자용',),
     );
@@ -85,26 +75,27 @@ class _MyHomePageState extends State<TempPage> {
 
   @override
   Widget build(BuildContext context) {
-// This method is rerun every time setState is called, for instance as done
-// by the _incrementCounter method above.
-//
-// The Flutter framework has been optimized to make rerunning build methods
-// fast, so that you can just rebuild anything that needs updating rather
-// than having to individually change instances of widgets.
-    return new Scaffold(
-        body: Container(
-          alignment: Alignment.center,
-          padding: EdgeInsets.all(20.0),
-          decoration: BoxDecoration(
-            image: DecorationImage(image: AssetImage("assets/jwmain.png"), fit: BoxFit.cover),
-          ),
-          child: Stack(
-            children: <Widget>[
-              _showBody(),
-              _showCircularProgress(),
-            ],
-          ),
-        )
+    return new MaterialApp(
+      title: '초기값 입력',
+      theme: ThemeData(
+        primaryColor: Colors.green[900],
+        bottomAppBarColor: Colors.grey[300],
+      ),
+      home: Scaffold(
+          body: Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.all(20.0),
+            decoration: BoxDecoration(
+              image: DecorationImage(image: AssetImage("assets/jwmain.png"), fit: BoxFit.cover),
+            ),
+            child: Stack(
+              children: <Widget>[
+                _showBody(),
+                _showCircularProgress(),
+              ],
+            ),
+          )
+      ),
     );
   }
 
@@ -116,31 +107,29 @@ class _MyHomePageState extends State<TempPage> {
   }
 
   Widget _showBody() {
-    return new Center(
-      child: Container(
-        alignment: Alignment.center,
-        padding: EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          backgroundBlendMode: BlendMode.softLight,
-          color: Colors.white,
-        ),
-        child: Form(
-          key: _formKey,
-          child: new ListView(
-            shrinkWrap: false,
-            children: <Widget>[
-              _showImage(),
-              Text("시작하기 전, 원하시는 비밀번호로 변경하여 주세요. \n(지금 이 계정은 실제로 비밀번호를 바꿀 수 없습니다)", textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13.0,),),
-              Padding(padding: const EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 0.0),),
-              Text("비밀번호 변경", textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.green[900], fontSize: 20.0, fontWeight: FontWeight.bold),
-              ),
-              _showEmailInput(),
-              _showPasswordInput(),
-              _submit(),
-            ],
-          ),
+    return new Container(
+      padding: EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        backgroundBlendMode: BlendMode.softLight,
+        color: Colors.white,
+      ),
+      child: Form(
+        key: _formKey,
+        child: new ListView(
+          shrinkWrap: true,
+          children: <Widget>[
+            _showImage(),
+            Text("시작하기 전, 원하시는 비밀번호로 변경하여 주세요.", textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13.0,),),
+            Padding(padding: const EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 0.0),),
+            Text("비밀번호 변경", textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.green[900], fontSize: 20.0, fontWeight: FontWeight.bold),
+            ),
+            _showEmailInput(),
+            _showPasswordInput(),
+            _submit(),
+            Text("\n\n주차 안내부 오용호 : 010-1254-4444", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
+          ],
         ),
       ),
     );
@@ -209,40 +198,35 @@ class _MyHomePageState extends State<TempPage> {
     if (form.validate()) {
       form.save();
       if (_email == _password) {
-        Navigator.pushReplacement(
-          context,
-          new MaterialPageRoute(
-              builder: (BuildContext context) => new InitApp()
-          ),
-        );
+        await fetchPost(prefs.getString('token'), _password).then((data) async {
+        if (data.ok) {
+          await prefs.setString('pw', _password);
+          await prefs.setString('token', data.token);
+          Navigator.pushReplacement(
+            context,
+            new MaterialPageRoute(
+                builder: (BuildContext context) => new InitApp()
+            ),
+          );
+        } else {
+          alert(data.reason);
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }).catchError((e) {
+          alert("네트워크를 확인해주세요.");
+          print(e.toString());
+          setState(() {
+            _isLoading = false;
+          });
+        });
       } else {
         alert("비밀번호가 일치한지 확인해주세요.");
         setState(() {
           _isLoading = false;
         });
       }
-//      await fetchPost(_email, _password).then((post) async {
-//        if (post.ok) {
-//          print(await prefs.setString('id', _email));
-//          await prefs.setString('pw', _password);
-//          await prefs.setString('token', post.token);
-//          Navigator.pushReplacement(
-//            context,
-//            new MaterialPageRoute(
-//                builder: (BuildContext context) => new TempApp()
-//            ),
-//          );
-//        } else {
-//          alert("비밀번호가 일치한지 확인해주세요.");
-//          setState(() {
-//            _isLoading = false;
-//          });
-//        }
-//      }).catchError((e) {
-//        alert("비밀번호가 일치한지 확인해주세요.");
-//        setState(() {
-//          _isLoading = false;
-//        });
     }
     setState(() {
       _isLoading = false;

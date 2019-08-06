@@ -10,6 +10,7 @@ import 'package:pdsample/send.dart';
 import 'package:pdsample/receive.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:pdsample/change.dart';
 
 class Post {
   final bool ok;
@@ -41,19 +42,43 @@ class Init {
   }
 }
 
-class InitApp extends StatefulWidget {
+class InitApp extends StatelessWidget {
+// This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+      title: '2019 국제대회 주차부',
+      theme: new ThemeData(
+// This is the theme of your application.
+//
+// Try running your application with "flutter run". You'll see the
+// application has a blue toolbar. Then, without quitting the app, try
+// changing the primarySwatch below to Colors.green and then invoke
+// "hot reload" (press "r" in the console where you ran "flutter run",
+// or press Run > Flutter Hot Reload in IntelliJ). Notice that the
+// counter didn't reset back to zero; the application is not restarted.
+        primaryColor: Colors.green[900],
+      ),
+      home: new InitPage(title: '주차부 버스 인솔자용',),
+    );
+  }
+}
+
+class InitPage extends StatefulWidget {
+  InitPage({Key key, this.title}) : super(key: key);
+
+  final String title;
+
   @override
   _MyAppState createState() => new _MyAppState();
 }
 
 enum Timeline { morning, afternoon }
 
-class _MyAppState extends State<InitApp> {
+class _MyAppState extends State<InitPage> {
   final _formKey = new GlobalKey<FormState>();
   String _guideName;
-  final controller1 = TextEditingController();
   String _guideNumber;
-  final controller2 = TextEditingController();
   String _busCode;
   final controller3 = TextEditingController();
   String _busNumber;
@@ -73,8 +98,10 @@ class _MyAppState extends State<InitApp> {
     prefs = await SharedPreferences.getInstance();
     await _user().then((data) {
       if (data['ok']) {
-        controller1.text = data['bus_info']['bus_guide_name'];
-        controller2.text = data['bus_info']['bus_guide_phone'];
+        _guideName = data['bus_info']['bus_guide_name'];
+        _guideNumber = data['bus_info']['bus_guide_phone'];
+        _busCode = data['bus_info']['bus_number'];
+        _busNumber = data['bus_info']['bus_driver_phone'];
         controller3.text = data['bus_info']['bus_number'];
         controller4.text = data['bus_info']['bus_driver_phone'];
       }
@@ -423,6 +450,25 @@ class _MyAppState extends State<InitApp> {
                               style: new TextStyle(fontSize: 20.0, color: Colors.white)),
                         ),
                       ),
+                      Row(
+                          children: <Widget>[
+                            Expanded(
+                                child: Divider(height: 5, color: Colors.black,)
+                            ),
+                          ]
+                      ),
+                      Container(
+                        padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
+                        child: RaisedButton(
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          onPressed: () {
+                              _change();
+                            },
+                          child: new Text('비밀번호 변경',
+                              style: new TextStyle(fontSize: 20.0, color: Colors.green[900])),
+                        ),
+                      ),
                     ],
                   );
                 } else {
@@ -520,59 +566,30 @@ class _MyAppState extends State<InitApp> {
                 Text("오후", style: TextStyle(fontSize: 14),),
               ],
             ),
-            _guideNameInput(),
-            _busDriverInput(),
-            _busCodeInput(),
-            _memo(),
+            _timeline == Timeline.morning ? Container(
+              child: Column(
+                children: <Widget>[
+                  _busCodeInput(),
+                  _memo(),
+                ],
+              ),
+            ) : Container(),
             _submit(),
+            Text("\n\n주차 안내부 오용호 : 010-1254-4444", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
           ],
         ),
       ),
     );
   }
 
-  Widget _guideNameInput() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
-      child: new TextFormField(
-        controller: controller1,
-        maxLines: 1,
-        keyboardType: TextInputType.text,
-        autofocus: true,
-        decoration: new InputDecoration(
-          labelText: '인솔자 이름',
-        ),
-        validator: (value) => value.isEmpty ? '값을 입력하세요.' : null,
-        onSaved: (value) => _guideName = value,
-      ),
-    );
-  }
-
-  Widget _busDriverInput() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
-      child: new TextFormField(
-        controller: controller2,
-        maxLines: 1,
-        keyboardType: TextInputType.phone,
-        autofocus: true,
-        decoration: new InputDecoration(
-            labelText: '인솔자 전화번호',
-        ),
-        validator: (value) => value.isEmpty ? '값을 입력하세요.' : null,
-        onSaved: (value) => _guideNumber = value,
-      ),
-    );
-  }
-
   Widget _busCodeInput() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      padding: EdgeInsets.zero,
       child: new TextFormField(
         controller: controller3,
         maxLines: 1,
         keyboardType: TextInputType.text,
-        autofocus: false,
+        autofocus: true,
         decoration: new InputDecoration(
             labelText: '차량 번호 (예: 12가 3456)',
         ),
@@ -606,7 +623,7 @@ class _MyAppState extends State<InitApp> {
           color: Colors.green[900],
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           onPressed: () {
-            confirm(_commitDate + " " + (_timeline == Timeline.morning ? "오전" : "오후") + "\n\n" + "인솔자 이름:"+ controller1.text + "\n\n" + "인솔자 전화번호:"+ controller2.text + "\n\n" + "차량 번호:"+ controller3.text + "\n\n" + "기사 연락처:"+ controller4.text + "\n\n" + "위 정보가 맞습니까?");
+            confirm(_commitDate + " " + (_timeline == Timeline.morning ? "오전"  + "\n\n" + "차량 번호:"+ controller3.text + "\n\n" + "기사 연락처:"+ controller4.text : "오후") + "\n\n" + "위 정보가 맞습니까?");
           },
           child: new Text('확인',
               style: new TextStyle(fontSize: 20.0, color: Colors.white)),
@@ -623,6 +640,13 @@ class _MyAppState extends State<InitApp> {
       new MaterialPageRoute(
           builder: (BuildContext context) => new MyApp()
       ),
+    );
+  }
+
+  void _change() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ChangeApp(title: "비밀번호 변경",)),
     );
   }
 

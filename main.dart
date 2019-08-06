@@ -1,21 +1,13 @@
 import 'package:flutter/material.dart';
-import 'send.dart';
-import 'confirm.dart';
-import 'store.dart';
 import 'temp.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'receive.dart';
 import 'package:flutter/services.dart';
-import 'package:pdsample/store.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:pdsample/init.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:url_launcher/url_launcher.dart';
-
-enum FormMode { LOGIN, SIGNUP }
 
 void main() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -27,7 +19,11 @@ void main() async {
       await prefs.setString('id', id);
       await prefs.setString('pw', pw);
       await prefs.setString('token', post.token);
-      runApp(TempApp());
+      if (pw != "1234") {
+        runApp(InitApp());
+      } else {
+        runApp(TempApp()); /// TempApp()으로 교체
+      }
     } else {
       await prefs.setString('id', null);
       await prefs.setString('pw', null);
@@ -116,26 +112,27 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-// This method is rerun every time setState is called, for instance as done
-// by the _incrementCounter method above.
-//
-// The Flutter framework has been optimized to make rerunning build methods
-// fast, so that you can just rebuild anything that needs updating rather
-// than having to individually change instances of widgets.
-    return new Scaffold(
-        body: Container(
-          alignment: Alignment.center,
-          padding: EdgeInsets.all(20.0),
-          decoration: BoxDecoration(
-            image: DecorationImage(image: AssetImage("assets/jwmain.png"), fit: BoxFit.cover),
+    return new MaterialApp(
+      title: '초기값 입력',
+      theme: ThemeData(
+        primaryColor: Colors.green[900],
+        bottomAppBarColor: Colors.grey[300],
+      ),
+      home: Scaffold(
+          body: Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.all(20.0),
+            decoration: BoxDecoration(
+              image: DecorationImage(image: AssetImage("assets/jwmain.png"), fit: BoxFit.cover),
+            ),
+            child: Stack(
+              children: <Widget>[
+                _showBody(),
+                _showCircularProgress(),
+              ],
+            ),
           ),
-          child: Stack(
-            children: <Widget>[
-              _showBody(),
-              _showCircularProgress(),
-            ],
-          ),
-        )
+      ),
     );
   }
 
@@ -147,70 +144,74 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _showBody() {
-    return new Center(
-      child: Container(
-        alignment: Alignment.center,
-        padding: EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          backgroundBlendMode: BlendMode.softLight,
-          color: Colors.white,
-        ),
-        child: Form(
-          key: _formKey,
-          child: new ListView(
-            shrinkWrap: false,
-            children: <Widget>[
-              _showImage(),
-              Padding(padding: const EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 0.0),),
-              Text("SIC2019 주차지원", textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.green[900], fontSize: 20.0, fontWeight: FontWeight.bold),
-              ),
-              _showEmailInput(),
-              _showPasswordInput(),
-              _submit(),
-              Row(
-                  children: <Widget>[
-                    Expanded(
-                        child: Divider(height: 36, color: Colors.black,)
-                    ),
-                    Text("  또는  "),
-                    Expanded(
-                        child: Divider(height: 36, color: Colors.black,)
-                    ),
-                  ]
-              ),
-              _seeAbove(),
-              FlatButton(
-                onPressed: () async {
-                  String url;
-                  if (Platform.isAndroid) {
-                    url = "https://blog.naver.com/hyla981020/221505617243";
-                    if (await canLaunch(url)) {
-                      await launch(
-                        url,
-                        forceSafariVC: true,
-                        forceWebView: true,
-                        enableJavaScript: true,
-                      );
-                    }
-                  } else {
-                    url = "https://blog.naver.com/hyla981020/221505617243";
-                    try {
-                      await launch(
-                        url,
-                        forceSafariVC: true,
-                        forceWebView: true,
-                        enableJavaScript: true,
-                      );
-                    } catch (e) {
-                      print(e.toString());
-                    }
+    return new Container(
+      padding: EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        backgroundBlendMode: BlendMode.softLight,
+        color: Colors.white,
+      ),
+      child: new Form(
+        key: _formKey,
+        child: new ListView(
+          shrinkWrap: true,
+          children: <Widget>[
+            _showImage(),
+            Padding(padding: const EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 0.0),),
+            Text("SIC2019 주차지원", textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.green[900], fontSize: 20.0, fontWeight: FontWeight.bold),
+            ),
+            _showEmailInput(),
+            _showPasswordInput(),
+            _submit(),
+            Row(
+                children: <Widget>[
+                  Expanded(
+                      child: Divider(height: 36, color: Colors.black,)
+                  ),
+                  Text("  또는  "),
+                  Expanded(
+                      child: Divider(height: 36, color: Colors.black,)
+                  ),
+                ]
+            ),
+            _seeAbove(),
+            FlatButton(
+              onPressed: () async {
+                String url;
+                if (Platform.isAndroid) {
+                  url = "https://blog.naver.com/hyla981020/221505617243";
+                  if (await canLaunch(url)) {
+                    await launch(
+                      url,
+                      forceSafariVC: true,
+                      forceWebView: true,
+                      enableJavaScript: true,
+                    );
                   }
-                },
-                child: Text("개인정보취급방침", style: TextStyle(color: Colors.blue),),
-              ),
-            ],
-          ),
+                } else {
+                  url = "https://blog.naver.com/hyla981020/221505617243";
+                  try {
+                    await launch(
+                      url,
+                      forceSafariVC: true,
+                      forceWebView: true,
+                      enableJavaScript: true,
+                    );
+                  } catch (e) {
+                    print(e.toString());
+                  }
+                }
+              },
+              child: Text("개인정보취급방침", style: TextStyle(color: Colors.blue),),
+            ),
+            Text("사용자명과 비밀번호를 분실하였을 경우", textAlign: TextAlign.center,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[Text("주차 안내부", style: TextStyle(fontWeight: FontWeight.bold),),Text("로 문의해 주십시오."),],
+            ),
+            Text("\n\n주차 안내부 오용호 : 010-1254-4444", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
+          ],
         ),
       ),
     );
@@ -300,12 +301,22 @@ class _MyHomePageState extends State<MyHomePage> {
           print(await prefs.setString('id', _email));
           await prefs.setString('pw', _password);
           await prefs.setString('token', post.token);
-          Navigator.pushReplacement(
-            context,
-            new MaterialPageRoute(
-                builder: (BuildContext context) => new TempApp()
-            ),
-          );
+          if (_password != "1234") {
+            Navigator.pushReplacement(
+              context,
+              new MaterialPageRoute(
+                  builder: (BuildContext context) => new InitApp()
+              ),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              new MaterialPageRoute(
+                  builder: (BuildContext context) => new TempApp()
+              ),
+            );
+          }
+
         } else {
           alert("아이디나 비밀번호를 다시 확인해주세요");
           setState(() {

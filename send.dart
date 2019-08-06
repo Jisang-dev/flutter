@@ -7,7 +7,7 @@ import 'package:pdsample/store.dart';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:pdsample/main.dart';
-import 'package:pdsample/receive.dart';
+import 'package:pdsample/change.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pdsample/init.dart';
@@ -16,6 +16,21 @@ import 'dart:convert' show utf8, json;
 
 int timestamp;
 String commit;
+
+Future<Post> updateToken(String _token, String notification) async {
+  final response = await http.post (
+    "https://ip2019.tk/guide/api/notification",
+    body: json.encode({
+      "token" : _token,
+      "notification": notification,
+    }),
+    headers: {
+      "content-type" : "application/json",
+      "accept" : "application/json",
+    },
+  );
+  return Post.fromJson(json.decode(response.body));
+}
 
 class Step {
   static const DEPARTURE_INFO_REQUEST = 0;
@@ -88,13 +103,13 @@ class _MyAppState extends State<SendApp> {
 
         if (info['bus_step'] == Step.DEPARTURE_END) {
           confirm1 = confirm2 = confirm3 = confirm4 = confirm5 = true;
-        } if (info['bus_step'] == Step.DEPARTURE_TERMINAL) {
+        } else if (info['bus_step'] == Step.DEPARTURE_TERMINAL) {
           confirm1 = confirm2 = confirm3 = confirm4 = true;
-        } if (info['bus_step'] == Step.DEPARTURE_CP_2) {
+        } else if (info['bus_step'] == Step.DEPARTURE_CP_2) {
           confirm1 = confirm2 = confirm3 = true;
-        } if (info['bus_step'] == Step.DEPARTURE_CP_1) {
+        } else if (info['bus_step'] == Step.DEPARTURE_CP_1) {
           confirm1 = confirm2 = true;
-        } if (info['bus_step'] == Step.DEPARTURE_START) {
+        } else if (info['bus_step'] == Step.DEPARTURE_START) {
           confirm1 = true;
         }
 
@@ -167,6 +182,17 @@ class _MyAppState extends State<SendApp> {
     });
     _firebaseMessaging.getToken().then((token) async {
       print(token);
+      prefs = await SharedPreferences.getInstance();
+      await updateToken(prefs.getString('token'), token).then((post) {
+        if (post.ok) {
+          print(post.ok);
+        } else {
+          print(post.reason);
+        }
+      }).catchError((e) {
+        print(e.toString());
+      });
+      print(token);
       Firestore.instance.collection('01').document(_email).get().then((data) {
         final cell = Cell.fromSnapshot(data);
         Firestore.instance.runTransaction((transaction) async {
@@ -238,6 +264,13 @@ class _MyAppState extends State<SendApp> {
     } on Exception catch (e) {
       e.toString();
     }
+  }
+
+  void _change() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ChangeApp()),
+    );
   }
 
   void sample() async {
@@ -635,6 +668,26 @@ class _MyAppState extends State<SendApp> {
                           style: new TextStyle(fontSize: 20.0, color: Colors.white)),
                     ),
                   ),
+
+                  Row(
+                      children: <Widget>[
+                        Expanded(
+                            child: Divider(height: 5, color: Colors.black,)
+                        ),
+                      ]
+                  ),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
+                    child: RaisedButton(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      onPressed: () {
+                        _change();
+                      },
+                      child: new Text('비밀번호 변경',
+                          style: new TextStyle(fontSize: 20.0, color: Colors.green[900])),
+                    ),
+                  ),
                 ],
               );
             } else {
@@ -742,6 +795,60 @@ class _MyAppState extends State<SendApp> {
             child: Row(
               children: <Widget>[
                 Expanded(
+                  child: Text("출발, 도착 예정 시간", style: TextStyle(fontSize: 14.0,),),
+                ),
+                Expanded(
+                  child: Text("07:20-07:50", style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.pink),),
+                ),
+                Container(
+                  alignment: Alignment.centerRight,
+                  child: ButtonTheme(
+                    minWidth: 10.0,
+                    child: RaisedButton(
+                      padding: EdgeInsets.zero,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      color: Colors.blue,
+                      onPressed: () async {
+                        String url;
+                        if (Platform.isAndroid) {
+                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                          if (await canLaunch(url)) {
+                            await launch(
+                              url,
+                              forceSafariVC: true,
+                              forceWebView: true,
+                              enableJavaScript: true,
+                            );
+                          }
+                        } else {
+                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                          try {
+                            await launch(
+                              url,
+                              forceSafariVC: true,
+                              forceWebView: true,
+                              enableJavaScript: true,
+                            );
+                          } catch (e) {
+                            print(e.toString());
+                          }
+                        }
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text("지도", style: TextStyle(fontSize: 10.0, color: Colors.white,),),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ) : Container(),
+          (info != null) ? Container(
+            padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+            child: Row(
+              children: <Widget>[
+                Expanded(
                   child: Text("주차장(터미널) 정보", style: TextStyle(fontSize: 14.0,),),
                 ),
                 Expanded(
@@ -802,6 +909,7 @@ class _MyAppState extends State<SendApp> {
           terminalArrive(),
           terminalDepart(),
           finish(),
+          Text("\n\n주차 안내부 오용호 : 010-1254-4444\n\n", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
         ],
       ),
     );
@@ -812,6 +920,7 @@ class _MyAppState extends State<SendApp> {
       color: !confirm1 ? Colors.grey[100] : Colors.orange[200],
       child: ListTile(
         title: Text("출발", textAlign: TextAlign.center,),
+        subtitle: Text("버스가 출발하였을 때 누릅니다. \nGPS가 켜져있는지도 확인해주세요.", textAlign: TextAlign.center,),
         onTap: () {
           !confirm1 ? alert("버스가 출발하였습니까?", 1) : alert("버스가 출발하지 않았습니까?", 6);
         },
@@ -824,6 +933,7 @@ class _MyAppState extends State<SendApp> {
       color: !confirm2 ? Colors.grey[100] : Colors.orange[200],
       child: ListTile(
         title: Text("1차지점 통과", textAlign: TextAlign.center,),
+        subtitle: Text("1차 지점을 통과하였음에도 \n자동으로 진행이 안 될 때 누릅니다.", textAlign: TextAlign.center,),
         onTap: () {
           !confirm2 ? alert("버스가 1차지점을 통과하였습니까?", 2) : alert("버스가 아직 1차지점을 출발하지 않았습니까?", 7);
         },
@@ -836,6 +946,7 @@ class _MyAppState extends State<SendApp> {
       color: !confirm3 ? Colors.grey[100] : Colors.orange[200],
       child: ListTile(
         title: Text("2차 지점 통과, 도착(예정)", textAlign: TextAlign.center,),
+        subtitle: Text("2차 지점을 통과하였음에도 \n자동으로 진행이 안 될 때 누릅니다.", textAlign: TextAlign.center,),
         onTap: () {
           !confirm3 ? alert("버스가 2차 지점을 통과하였거나, 킨텍스 근처에 성공적으로 도착하셨습니까?", 3) : alert("버스가 아직 2차 지점이나 근처에 도착하지 않았습니까?", 8);
         },
@@ -848,6 +959,7 @@ class _MyAppState extends State<SendApp> {
       color: !confirm4 ? Colors.grey[100] : Colors.orange[200],
       child: ListTile( // check -> confirm
         title: Text("터미널도착", textAlign: TextAlign.center,),
+        subtitle: Text("터미널에 도착하였을 때 누릅니다.", textAlign: TextAlign.center,),
         onTap: () {
           !confirm4 ? alert("버스가 터미널에 정차하였습니까?", 4) : alert("버스가 아직 터미널에 정차하지 않았습니까?", 9);
         },
@@ -860,6 +972,7 @@ class _MyAppState extends State<SendApp> {
       color: !confirm5 ? Colors.grey[100] : Colors.orange[200],
       child: ListTile( // check -> confirm
         title: Text("터미널출발", textAlign: TextAlign.center,),
+        subtitle: Text("모두 하차하고, 버스가 터미널을 떠날 때 누릅니다.", textAlign: TextAlign.center,),
         onTap: () {
           !confirm5 ? alert("버스 승객이 모두 하차하였고, 버스가 터미널을 빠져나왔습니까?", 5) : alert("버스가 아직 터미널을 출발하지 않았습니까?", 10);
         },
@@ -869,7 +982,7 @@ class _MyAppState extends State<SendApp> {
 
   Widget finish() {
     return ListTile(
-      title: confirm5 ? Text("수고하셨습니다!") : null,
+      title: confirm5 ? Text("수고하셨습니다!", style: TextStyle(fontSize: 14), textAlign: TextAlign.center,) : null,
     );
   }
 

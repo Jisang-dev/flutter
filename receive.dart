@@ -7,7 +7,7 @@ import 'package:pdsample/store.dart';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:pdsample/main.dart';
-import 'package:pdsample/send.dart';
+import 'package:pdsample/change.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pdsample/init.dart';
@@ -16,6 +16,38 @@ import 'dart:convert' show utf8, json;
 
 int timestamp;
 String commit;
+
+Future<Post> updateToken(String _token, String notification) async {
+  final response = await http.post (
+    "https://ip2019.tk/guide/api/notification",
+    body: json.encode({
+      "token" : _token,
+      "notification": notification,
+    }),
+    headers: {
+      "content-type" : "application/json",
+      "accept" : "application/json",
+    },
+  );
+  return Post.fromJson(json.decode(response.body));
+}
+
+class Step {
+  static const DEPARTURE_INFO_REQUEST = 0;
+  static const DEPARTURE_READY = 10;
+  static const DEPARTURE_START = 11;
+  static const DEPARTURE_CP_1 = 12;
+  static const DEPARTURE_CP_2 = 13;
+  static const DEPARTURE_TERMINAL = 14;
+  static const DEPARTURE_END = 15;
+
+  static const RETURN_REQUEST = 20;
+  static const RETURN_READY = 21;
+  static const RETURN_CALL = 22;
+  static const RETURN_TERMINAL = 23;
+  static const RETURN_RIDE = 24;
+  static const RETURN_END = 24;
+}
 
 class ReceiveApp extends StatefulWidget {
   ReceiveApp(String com) {
@@ -53,27 +85,42 @@ class _MyAppState extends State<ReceiveApp> {
 
   int _count = 0;
 
-  Future<void> _setBackground() async { // for iOS and androidOS
-    try {
-      await platform.invokeMethod('initLocation');
-    } on Exception catch (e) {
-      print(e.toString());
-    }
-  }
-
   void currentUser() async {
     prefs = await SharedPreferences.getInstance();
     await _user().then((data) {
-      setState(() {
-        info = data['bus_info'];
-      });
+      if (data != null && data['ok']) {
+        setState(() {
+          info = data['bus_info'];
+        });
+        if (info['bus_step'] == Step.RETURN_END || info['bus_step'] == Step.RETURN_RIDE) {
+          confirm1 = confirm2 = confirm3 = confirm4 = true;
+        } else if (info['bus_step'] == Step.RETURN_TERMINAL) {
+          confirm1 = confirm2 = confirm3 = true;
+        } else if (info['bus_step'] == Step.RETURN_CALL) {
+          confirm1 = confirm2 = true;
+        } else if (info['bus_step'] == Step.RETURN_REQUEST || info['bus_step'] == Step.RETURN_READY) {
+          confirm1 = true;
+        }
+      }
+    });
+  }
+
+  void initReturn() async {
+    prefs = await SharedPreferences.getInstance();
+    status(prefs.getString("token"), "request").then((post) {
+      if (post.ok) {
+        setState(() {
+          confirm1 = true;
+          _isLoading = false;
+        });
+      }
     });
   }
 
   @override
   void initState() {
     super.initState();
-    getEmail();
+    initReturn();
     currentUser();
     timestamp = (Platform.isAndroid ? Timestamp.fromDate(DateTime.now()).millisecondsSinceEpoch : Timestamp.fromDate(DateTime.now()).seconds);
 
@@ -90,6 +137,7 @@ class _MyAppState extends State<ReceiveApp> {
             }
           });
         });
+        currentUser();
       },
       onResume: (Map<String, dynamic> message) async {
         print('on resume $message');
@@ -102,6 +150,7 @@ class _MyAppState extends State<ReceiveApp> {
             }
           });
         });
+        currentUser();
       },
       onLaunch: (Map<String, dynamic> message) async {
         print('on launch $message');
@@ -114,6 +163,7 @@ class _MyAppState extends State<ReceiveApp> {
             }
           });
         });
+        currentUser();
       },
     );
     _firebaseMessaging.requestNotificationPermissions(
@@ -128,43 +178,22 @@ class _MyAppState extends State<ReceiveApp> {
     });
     _firebaseMessaging.getToken().then((token) async {
       print(token);
+      prefs = await SharedPreferences.getInstance();
+      await updateToken(prefs.getString('token'), token).then((post) {
+        if (post.ok) {
+          print(post.ok);
+        } else {
+          print(post.reason);
+        }
+      }).catchError((e) {
+        print(e.toString());
+      });
       Firestore.instance.collection('01').document(_email).get().then((data) {
         final cell = Cell.fromSnapshot(data);
         Firestore.instance.runTransaction((transaction) async {
           await transaction
               .update(cell.reference, {'token': token});
         });
-      });
-    });
-  }
-
-  void getEmail() async {
-    await Firestore.instance.collection('01').document("temporary10@pdsample.com").get().then((data) {
-      final cell = Cell.fromSnapshot(data);
-      setState(() {
-        confirm1 = (cell.depart != null && cell.depart != "");
-        confirm2 = cell.access;
-        confirm3 = (cell.tArrive != null && cell.tArrive != "");
-        confirm4 = (cell.tDepart != null && cell.tDepart != "");
-      });
-      if (confirm2) {
-        setState(() {
-          confirm1 = true;
-        });
-      }
-    });
-  }
-
-  void background(String latlang) async {
-    print("background");
-    var latlng = latlang.split(",");
-    Firestore.instance.collection('01').document(_email).get().then((data) {
-      final cell = Cell.fromSnapshot(data);
-      Firestore.instance.runTransaction((transaction) async {
-        await transaction
-            .update(cell.reference, {'lat': double.parse(latlng[0])});
-        await transaction
-            .update(cell.reference, {'long': double.parse(latlng[1])});
       });
     });
   }
@@ -196,38 +225,11 @@ class _MyAppState extends State<ReceiveApp> {
     );
   }
 
-  void sample() async {
-    location = new Location();
-    StreamSubscription<LocationData> streamListen;
-//    await location.changeSettings(distanceFilter: 400, accuracy: LocationAccuracy.BALANCED);
-    if (await location.requestPermission()) {
-      streamListen = location.onLocationChanged().listen((LocationData currentLocation) async {
-        if (_count < 150 && currentLocation.time.toInt() > _count * 60000 + timestamp) {
-          Firestore.instance.collection('01').document(_email).get().then((data) {
-            final cell = Cell.fromSnapshot(data);
-            Firestore.instance.runTransaction((transaction) async {
-              await transaction
-                  .update(cell.reference, {'lat': currentLocation.latitude});
-              await transaction
-                  .update(cell.reference, {'long': currentLocation.longitude});
-            });
-          });
-          _count++;
-          if (_count < (currentLocation.time.toInt() - timestamp) ~/ 60000) {
-            _count = (currentLocation.time.toInt() - timestamp) ~/ 60000;
-          }
-        }
-        if (_count > 150) { /// 꼭 수정
-          streamListen.cancel();
-          try {
-            await platform.invokeMethod('stop');
-          } on Exception catch (e) {
-            e.toString();
-          }
-        }
-      });
-
-    }
+  void _change() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ChangeApp()),
+    );
   }
 
   Future<Map<String, dynamic>> _user() async {
@@ -266,7 +268,7 @@ class _MyAppState extends State<ReceiveApp> {
           IconButton(
             icon: Icon(Icons.refresh),
             onPressed: () {
-              getEmail();
+              currentUser();
             },
           ),
         ],
@@ -594,6 +596,26 @@ class _MyAppState extends State<ReceiveApp> {
                           style: new TextStyle(fontSize: 20.0, color: Colors.white)),
                     ),
                   ),
+
+                  Row(
+                      children: <Widget>[
+                        Expanded(
+                            child: Divider(height: 5, color: Colors.black,)
+                        ),
+                      ]
+                  ),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
+                    child: RaisedButton(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      onPressed: () {
+                        _change();
+                      },
+                      child: new Text('비밀번호 변경',
+                          style: new TextStyle(fontSize: 20.0, color: Colors.green[900])),
+                    ),
+                  ),
                 ],
               );
             } else {
@@ -760,6 +782,7 @@ class _MyAppState extends State<ReceiveApp> {
           terminalArrive(),
           terminalDepart(),
           finish(),
+          Text("\n\n주차 안내부 오용호 : 010-1254-4444\n\n", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
         ],
       ),
     );
@@ -770,6 +793,7 @@ class _MyAppState extends State<ReceiveApp> {
       color: !confirm1 ? Colors.grey[100] : Colors.orange[200],
       child: ListTile(
         title: Text("준비 완료, 출발 요청", textAlign: TextAlign.center,),
+        subtitle: Text("버스 승객이 모두 모였을 경우 누릅니다.", textAlign: TextAlign.center,),
         onTap: () {
           setState(() {
             !confirm1 ? alert("버스 출발을 요청하시겠습니까?", 1) : alert("버스 출발 요청을 취소하겠습니까??", 6);
@@ -783,8 +807,9 @@ class _MyAppState extends State<ReceiveApp> {
     return Container(
         color: !confirm2 ? Colors.grey[100] : Colors.orange[700],
         child: ListTile(
-      title: Text("요청 승인, 위치 확인", textAlign: TextAlign.center,),
-      onTap: () {
+          title: Text("요청 승인, 위치 확인", textAlign: TextAlign.center,),
+          subtitle: Text("관제에서 요청을 승인할 때 자동으로 켜집니다.", textAlign: TextAlign.center,),
+          onTap: () {
         !confirm2 ? alert("관제팀에서 터미널 접근을 승인하지 않았습니다. 새로고침을 눌러 다시 확인해주세요.", 4) : alert("터미널 접근이 승인되었습니다.", 9);
       },
         ),
@@ -795,8 +820,9 @@ class _MyAppState extends State<ReceiveApp> {
     return Container(
         color: !confirm3 ? Colors.grey[100] : Colors.orange[200],
         child: ListTile(
-      title: Text("터미널도착", textAlign: TextAlign.center,),
-      onTap: () {
+          title: Text("터미널도착", textAlign: TextAlign.center,),
+          subtitle: Text("터미널에 버스가 도착할 때 누릅니다.", textAlign: TextAlign.center,),
+          onTap: () {
         !confirm3 ? alert("버스가 터미널에 정차하였습니까?", 2) : alert("버스가 아직 터미널에 정차하지 않았습니까?", 7);
       },
         ),
@@ -807,8 +833,9 @@ class _MyAppState extends State<ReceiveApp> {
     return Container(
         color: !confirm4 ? Colors.grey[100] : Colors.orange[200],
         child: ListTile(
-      title: Text("터미널출발", textAlign: TextAlign.center,),
-      onTap: () {
+          title: Text("터미널출발", textAlign: TextAlign.center,),
+          subtitle: Text("킨텍스를 성공적으로 떠났을 경우 누릅니다.", textAlign: TextAlign.center,),
+          onTap: () {
         !confirm4 ? alert("버스 승객이 모두 승차하였고, 버스가 터미널을 빠져나왔습니까?", 3) : alert("버스가 아직 터미널을 출발하지 않았습니까?", 8);
       },
         ),
@@ -817,7 +844,7 @@ class _MyAppState extends State<ReceiveApp> {
 
   Widget finish() {
     return ListTile(
-      title: confirm4 ? Text("수고하셨습니다!") : null,
+      title: confirm4 ? Text("수고하셨습니다!", style: TextStyle(fontSize: 14), textAlign: TextAlign.center,) : null,
     );
   }
 
@@ -893,7 +920,7 @@ class _MyAppState extends State<ReceiveApp> {
               child: Text('네'),
               onPressed: () {
                 Navigator.of(context).pop();
-                getEmail();
+                currentUser();
               },
             ),
           ],
@@ -925,7 +952,7 @@ class _MyAppState extends State<ReceiveApp> {
                 });
                 switch (process) {
                   case 1:
-                    /*status(prefs.getString("token"), "start").then((post) {
+                    status(prefs.getString("token"), "ready").then((post) {
                       if (post.ok) {
                         setState(() {
                           confirm1 = true;
@@ -933,92 +960,98 @@ class _MyAppState extends State<ReceiveApp> {
                         });
                         success();
                       }
-                    });*/
-                    Firestore.instance.collection('01')
-                        .document(_email)
-                        .updateData(<String, dynamic>{'depart': (DateTime.now().hour < 10 ? "0" + DateTime.now().hour.toString() : DateTime.now().hour.toString()) + ":" + (DateTime.now().minute < 10 ? "0" + DateTime.now().minute.toString() : DateTime.now().minute.toString())})
-                        .then((a) {
-                      setState(() {
-                        confirm1 = true;
-                        _isLoading = false;
-                      });
-                      success();
+                    });
+                    setState(() {
+                      _isLoading = false;
                     });
                     break;
                   case 2:
                     if (confirm2) {
-                      Firestore.instance.collection('01')
-                          .document(_email)
-                          .updateData(<String, dynamic>{'tArrive': (DateTime.now().hour < 10 ? "0" + DateTime.now().hour.toString() : DateTime.now().hour.toString()) + ":" + (DateTime.now().minute < 10 ? "0" + DateTime.now().minute.toString() : DateTime.now().minute.toString())})
-                          .then((a) {
-                        setState(() {
-                          confirm3 = true;
-                          _isLoading = false;
-                        });
-                        success();
+                      status(prefs.getString("token"), "rTerminal").then((post) {
+                        if (post.ok) {
+                          setState(() {
+                            confirm3 = true;
+                            _isLoading = false;
+                          });
+                          success();
+                        }
                       });
                     } else {
                       confirm();
+                      setState(() {
+                        _isLoading = false;
+                      });
                     }
                     break;
                   case 3:
                     if (confirm3) {
-                      Firestore.instance.collection('01')
-                          .document(_email)
-                          .updateData(<String, dynamic>{'tDepart': (DateTime.now().hour < 10 ? "0" + DateTime.now().hour.toString() : DateTime.now().hour.toString()) + ":" + (DateTime.now().minute < 10 ? "0" + DateTime.now().minute.toString() : DateTime.now().minute.toString())})
-                          .then((a) {
-                        setState(() {
-                          confirm4 = true;
-                          _isLoading = false;
-                        });
-                        success();
+                      status(prefs.getString("token"), "rEnd").then((post) {
+                        if (post.ok) {
+                          setState(() {
+                            confirm4 = true;
+                            _isLoading = false;
+                          });
+                          success();
+                        }
                       });
                     } else {
                       confirm();
+                      setState(() {
+                        _isLoading = false;
+                      });
                     }
                     break;
                   case 6:
                     if (!confirm2) {
-                      Firestore.instance.collection('01')
-                          .document(_email)
-                          .updateData(<String, dynamic>{'depart': null}).then((a) {
-                        setState(() {
-                          confirm1 = false;
-                          _isLoading = false;
-                        });
-                        success();
+                      status(prefs.getString("token"), "request").then((post) {
+                        if (post.ok) {
+                          setState(() {
+                            confirm1 = false;
+                            _isLoading = false;
+                          });
+                          success();
+                        }
                       });
                     } else {
                       confirm02();
+                      setState(() {
+                        _isLoading = false;
+                      });
                     }
                     break;
                   case 7:
                     if (!confirm4) {
-                      Firestore.instance.collection('01')
-                          .document(_email)
-                          .updateData(<String, dynamic>{'tArrive': null}).then((a) {
-                        setState(() {
-                          confirm3 = false;
-                          _isLoading = false;
-                        });
-                        success();
+                      status(prefs.getString("token"), "ready").then((post) {
+                        if (post.ok) {
+                          setState(() {
+                            confirm3 = false;
+                            _isLoading = false;
+                          });
+                          success();
+                        }
                       });
                     } else {
                       confirm02();
+                      setState(() {
+                        _isLoading = false;
+                      });
                     }
                     break;
                   case 8:
-                    Firestore.instance.collection('01')
-                        .document(_email)
-                        .updateData(<String, dynamic>{'tDepart': null}).then((a) {
-                      setState(() {
-                        confirm4 = false;
-                        _isLoading = false;
-                      });
-                      success();
+                    status(prefs.getString("token"), "rTerminal").then((post) {
+                      if (post.ok) {
+                        setState(() {
+                          confirm4 = false;
+                          _isLoading = false;
+                        });
+                        success();
+                      }
                     });
                     break;
                   default:
+                    setState(() {
+                      _isLoading = false;
+                    });
                     break;
                 }
                 // 데이터 전송
