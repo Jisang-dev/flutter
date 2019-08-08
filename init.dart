@@ -98,12 +98,12 @@ class _MyAppState extends State<InitPage> {
     prefs = await SharedPreferences.getInstance();
     await _user().then((data) {
       if (data['ok']) {
-        _guideName = data['bus_info']['bus_guide_name'];
-        _guideNumber = data['bus_info']['bus_guide_phone'];
-        _busCode = data['bus_info']['bus_number'];
-        _busNumber = data['bus_info']['bus_driver_phone'];
-        controller3.text = data['bus_info']['bus_number'];
-        controller4.text = data['bus_info']['bus_driver_phone'];
+        _guideName = data['bus_info']['bus_guide_name'] ?? "";
+        _guideNumber = data['bus_info']['bus_guide_phone'] ?? "";
+        _busCode = data['bus_info']['bus_number'] ?? "";
+        _busNumber = data['bus_info']['bus_driver_phone'] ?? "";
+        controller3.text = data['bus_info']['bus_number'] ?? "";
+        controller4.text = data['bus_info']['bus_driver_phone'] ?? "";
       }
     });
   }
@@ -162,7 +162,7 @@ class _MyAppState extends State<InitPage> {
                       Container(
                         color: Colors.grey[100],
                         padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                        child: Text(snapshot.data['bus_info']['bus_name'] + "\n" + "버스 n대 중 1호차" + "\n" + snapshot.data['bus_info']['bus_guide_name'] + "\n" + snapshot.data['bus_info']['bus_guide_phone']),
+                        child: Text((snapshot.data['bus_info']['bus_name'] ?? "") + "\n" + "버스 n대 중 1호차" + "\n" + (snapshot.data['bus_info']['bus_guide_name'] ?? "") + "\n" + (snapshot.data['bus_info']['bus_guide_phone'] ?? "")),
                       ),
                       Container(
                         color: Colors.grey[300],
@@ -463,8 +463,8 @@ class _MyAppState extends State<InitPage> {
                           color: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                           onPressed: () {
-                              _change();
-                            },
+                            _change();
+                          },
                           child: new Text('비밀번호 변경',
                               style: new TextStyle(fontSize: 20.0, color: Colors.green[900])),
                         ),
@@ -492,18 +492,32 @@ class _MyAppState extends State<InitPage> {
                   );
                 }
               } catch (e) {
-                return new Container(
-                  padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
-                  child: RaisedButton(
-                    color: Colors.green[900],
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    onPressed: logout,
-                    child: new Text('로그아웃',
-                        style: new TextStyle(fontSize: 20.0, color: Colors.white)),
-                  ),
+                return new ListView(
+                  padding: EdgeInsets.zero,
+                    children: <Widget>[
+                      Container(
+                        height: 90.0,
+                        child: DrawerHeader(
+                          child:  Text("2019SIC 주차 지원", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),),
+                          decoration: BoxDecoration(
+                            color: Colors.green[900],
+                          ),
+                        ),
+                      ),
+                      Text("접근 권한 오류", textAlign: TextAlign.center,),
+                      Container(
+                        padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
+                        child: RaisedButton(
+                          color: Colors.green[900],
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          onPressed: logout,
+                          child: new Text('로그아웃',
+                              style: new TextStyle(fontSize: 20.0, color: Colors.white)),
+                        ),
+                      ),
+                    ],
                 );
               }
-
             },
           ),
         ),
@@ -690,7 +704,7 @@ class _MyAppState extends State<InitPage> {
     if (form.validate()) {
       form.save();
 
-      await fetchPost(prefs.getString('token'), _guideName, _guideNumber, _busCode, _busNumber, "start").then((post) async {
+      await fetchPost(prefs.getString('token'), _guideName, _guideNumber, _busCode, _busNumber, _timeline == Timeline.morning ? "start" : "request").then((post) async {
         if (post.ok) {
           if (_timeline == Timeline.morning) {
             Navigator.pushReplacement(

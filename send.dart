@@ -58,7 +58,7 @@ class SendApp extends StatefulWidget {
   _MyAppState createState() => new _MyAppState();
 }
 
-class _MyAppState extends State<SendApp> {
+class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
   String _email = "temporary10@pdsample.com"; // 계정 이름
   bool _isLoading = false;
   SharedPreferences prefs;
@@ -73,6 +73,8 @@ class _MyAppState extends State<SendApp> {
   bool confirm3 = false;
   bool confirm4 = false;
   bool confirm5 = false;
+
+  AnimationController _animationController;
 
   Timeline _timeline = Timeline.morning;
   String _commitDate = commit;
@@ -119,9 +121,12 @@ class _MyAppState extends State<SendApp> {
 
   @override
   void initState() {
+    _animationController = new AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _animationController.repeat();
     super.initState();
     currentUser();
     timestamp = (Platform.isAndroid ? Timestamp.fromDate(DateTime.now()).millisecondsSinceEpoch : Timestamp.fromDate(DateTime.now()).seconds);
+
     platform.setMethodCallHandler((call) {
       if (call.method == "background") {
         background(call.arguments);
@@ -359,9 +364,360 @@ class _MyAppState extends State<SendApp> {
         child: FutureBuilder<Map<String, dynamic>> (
           future: _user(),
           builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
-            if (snapshot.hasData && snapshot.data != null) {
+            try {
+              if (snapshot.hasData && snapshot.data != null) {
+                return new ListView(
+                  // Important: Remove any padding from the ListView.
+                  padding: EdgeInsets.zero,
+                  children: <Widget>[
+                    Container(
+                      height: 90.0,
+                      child: DrawerHeader(
+                        child:  Text("2019SIC 주차 지원", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),),
+                        decoration: BoxDecoration(
+                          color: Colors.green[900],
+                        ),
+                      ),
+                    ),
+                    ListTile(
+                      title: Text('내 정보', style: TextStyle(fontWeight: FontWeight.bold),),
+                      leading: Icon(Icons.account_box),
+                    ),
+                    Container(
+                      color: Colors.grey[100],
+                      padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                      child: Text((snapshot.data['bus_info']['bus_name'] ?? "") + "\n" + "버스 n대 중 1호차" + "\n" + (snapshot.data['bus_info']['bus_guide_name'] ?? "") + "\n" + (snapshot.data['bus_info']['bus_guide_phone'] ?? "")),
+                    ),
+                    Container(
+                      color: Colors.grey[300],
+                      padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                      child: Text("첫째날(금요일) - 제1관터미널" + "\n" + "둘째날(토요일) - 제2관터미널" + "\n" + "셋째날(일요일) - 제1관터미널"),
+                    ),
+                    ListTile(
+                      title: Text('주차장', style: TextStyle(fontWeight: FontWeight.bold),),
+                      leading: Icon(Icons.flag),
+                    ),
+                    Container(
+                      color: Colors.grey[100],
+                      padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: () async {
+                              String url;
+                              if (Platform.isAndroid) {
+                                url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                                if (await canLaunch(url)) {
+                                  await launch(
+                                    url,
+                                    forceSafariVC: true,
+                                    forceWebView: true,
+                                    enableJavaScript: true,
+                                  );
+                                }
+                              } else {
+                                url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                                try {
+                                  await launch(
+                                    url,
+                                    forceSafariVC: true,
+                                    forceWebView: true,
+                                    enableJavaScript: true,
+                                  );
+                                } catch (e) {
+                                  print(e.toString());
+                                }
+                              }
+                            },
+                            child: Text("제1관 터미널", style: TextStyle(color: Colors.blue),),
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              String url;
+                              if (Platform.isAndroid) {
+                                url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                                if (await canLaunch(url)) {
+                                  await launch(
+                                    url,
+                                    forceSafariVC: true,
+                                    forceWebView: true,
+                                    enableJavaScript: true,
+                                  );
+                                }
+                              } else {
+                                url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                                try {
+                                  await launch(
+                                    url,
+                                    forceSafariVC: true,
+                                    forceWebView: true,
+                                    enableJavaScript: true,
+                                  );
+                                } catch (e) {
+                                  print(e.toString());
+                                }
+                              }
+                            },
+                            child: Text("제1관 주차장 내부", style: TextStyle(color: Colors.blue),),
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              String url;
+                              if (Platform.isAndroid) {
+                                url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                                if (await canLaunch(url)) {
+                                  await launch(
+                                    url,
+                                    forceSafariVC: true,
+                                    forceWebView: true,
+                                    enableJavaScript: true,
+                                  );
+                                }
+                              } else {
+                                url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                                try {
+                                  await launch(
+                                    url,
+                                    forceSafariVC: true,
+                                    forceWebView: true,
+                                    enableJavaScript: true,
+                                  );
+                                } catch (e) {
+                                  print(e.toString());
+                                }
+                              }
+                            },
+                            child: Text("제2관 터미널", style: TextStyle(color: Colors.blue),),
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              String url;
+                              if (Platform.isAndroid) {
+                                url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                                if (await canLaunch(url)) {
+                                  await launch(
+                                    url,
+                                    forceSafariVC: true,
+                                    forceWebView: true,
+                                    enableJavaScript: true,
+                                  );
+                                }
+                              } else {
+                                url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                                try {
+                                  await launch(
+                                    url,
+                                    forceSafariVC: true,
+                                    forceWebView: true,
+                                    enableJavaScript: true,
+                                  );
+                                } catch (e) {
+                                  print(e.toString());
+                                }
+                              }
+                            },
+                            child: Text("외부", style: TextStyle(color: Colors.blue),),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ListTile(
+                      title: Text('앱 사용법', style: TextStyle(fontWeight: FontWeight.bold),),
+                      leading: Icon(Icons.announcement),
+                    ),
+                    Container(
+                      color: Colors.grey[100],
+                      padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: () async {
+                              String url;
+                              if (Platform.isAndroid) {
+                                url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                                if (await canLaunch(url)) {
+                                  await launch(
+                                    url,
+                                    forceSafariVC: true,
+                                    forceWebView: true,
+                                    enableJavaScript: true,
+                                  );
+                                }
+                              } else {
+                                url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                                try {
+                                  await launch(
+                                    url,
+                                    forceSafariVC: true,
+                                    forceWebView: true,
+                                    enableJavaScript: true,
+                                  );
+                                } catch (e) {
+                                  print(e.toString());
+                                }
+                              }
+                            },
+                            child: Text("대회장으로", style: TextStyle(color: Colors.blue),),
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              String url;
+                              if (Platform.isAndroid) {
+                                url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                                if (await canLaunch(url)) {
+                                  await launch(
+                                    url,
+                                    forceSafariVC: true,
+                                    forceWebView: true,
+                                    enableJavaScript: true,
+                                  );
+                                }
+                              } else {
+                                url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                                try {
+                                  await launch(
+                                    url,
+                                    forceSafariVC: true,
+                                    forceWebView: true,
+                                    enableJavaScript: true,
+                                  );
+                                } catch (e) {
+                                  print(e.toString());
+                                }
+                              }
+                            },
+                            child: Text("집으로", style: TextStyle(color: Colors.blue),),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ListTile(
+                      title: Text('참고', style: TextStyle(fontWeight: FontWeight.bold),),
+                      leading: Icon(Icons.insert_drive_file),
+                    ),
+                    Container(
+                      color: Colors.grey[100],
+                      padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: () async {
+                              String url;
+                              if (Platform.isAndroid) {
+                                url = "https://jw2019.org";
+                                if (await canLaunch(url)) {
+                                  await launch(
+                                    url,
+                                    forceSafariVC: true,
+                                    forceWebView: true,
+                                    enableJavaScript: true,
+                                  );
+                                }
+                              } else {
+                                url = "https://jw2019.org";
+                                try {
+                                  await launch(
+                                    url,
+                                    forceSafariVC: true,
+                                    forceWebView: true,
+                                    enableJavaScript: true,
+                                  );
+                                } catch (e) {
+                                  print(e.toString());
+                                }
+                              }
+                            },
+                            child: Text("jw2019.org", style: TextStyle(color: Colors.blue),),
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              String url;
+                              if (Platform.isAndroid) {
+                                url = "https://blog.naver.com/hyla981020/221505617243";
+                                if (await canLaunch(url)) {
+                                  await launch(
+                                    url,
+                                    forceSafariVC: true,
+                                    forceWebView: true,
+                                    enableJavaScript: true,
+                                  );
+                                }
+                              } else {
+                                url = "https://blog.naver.com/hyla981020/221505617243";
+                                try {
+                                  await launch(
+                                    url,
+                                    forceSafariVC: true,
+                                    forceWebView: true,
+                                    enableJavaScript: true,
+                                  );
+                                } catch (e) {
+                                  print(e.toString());
+                                }
+                              }
+                            },
+                            child: Text("개인정보취급방침", style: TextStyle(color: Colors.blue),),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
+                      child: RaisedButton(
+                        color: Colors.green[900],
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        onPressed: logout,
+                        child: new Text('로그아웃',
+                            style: new TextStyle(fontSize: 20.0, color: Colors.white)),
+                      ),
+                    ),
+
+                    Row(
+                        children: <Widget>[
+                          Expanded(
+                              child: Divider(height: 5, color: Colors.black,)
+                          ),
+                        ]
+                    ),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
+                      child: RaisedButton(
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        onPressed: () {
+                          _change();
+                        },
+                        child: new Text('비밀번호 변경',
+                            style: new TextStyle(fontSize: 20.0, color: Colors.green[900])),
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                return new ListView(
+                  // Important: Remove any padding from the ListView.
+                  padding: EdgeInsets.zero,
+                  children: <Widget>[
+                    Container(
+                      height: 90.0,
+                      child: DrawerHeader(
+                        child:  Text("2019SIC 주차 지원", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20,),),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                        ),
+                      ),
+                    ),
+                    ListTile(
+                      title: Text("로딩중입니다..."),
+                    ),
+                  ],
+                );
+              }
+            } catch (e) {
               return new ListView(
-                // Important: Remove any padding from the ListView.
                 padding: EdgeInsets.zero,
                 children: <Widget>[
                   Container(
@@ -373,291 +729,7 @@ class _MyAppState extends State<SendApp> {
                       ),
                     ),
                   ),
-                  ListTile(
-                    title: Text('내 정보', style: TextStyle(fontWeight: FontWeight.bold),),
-                    leading: Icon(Icons.account_box),
-                  ),
-                  Container(
-                    color: Colors.grey[100],
-                    padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                    child: Text(snapshot.data['bus_info']['bus_name'] + "\n" + "버스 n대 중 1호차" + "\n" + snapshot.data['bus_info']['bus_guide_name'] + "\n" + snapshot.data['bus_info']['bus_guide_phone']),
-                  ),
-                  Container(
-                    color: Colors.grey[300],
-                    padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                    child: Text("첫째날(금요일) - 제1관터미널" + "\n" + "둘째날(토요일) - 제2관터미널" + "\n" + "셋째날(일요일) - 제1관터미널"),
-                  ),
-                  ListTile(
-                    title: Text('주차장', style: TextStyle(fontWeight: FontWeight.bold),),
-                    leading: Icon(Icons.flag),
-                  ),
-                  Container(
-                    color: Colors.grey[100],
-                    padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        GestureDetector(
-                          onTap: () async {
-                            String url;
-                            if (Platform.isAndroid) {
-                              url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                              if (await canLaunch(url)) {
-                                await launch(
-                                  url,
-                                  forceSafariVC: true,
-                                  forceWebView: true,
-                                  enableJavaScript: true,
-                                );
-                              }
-                            } else {
-                              url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                              try {
-                                await launch(
-                                  url,
-                                  forceSafariVC: true,
-                                  forceWebView: true,
-                                  enableJavaScript: true,
-                                );
-                              } catch (e) {
-                                print(e.toString());
-                              }
-                            }
-                          },
-                          child: Text("제1관 터미널", style: TextStyle(color: Colors.blue),),
-                        ),
-                        GestureDetector(
-                          onTap: () async {
-                            String url;
-                            if (Platform.isAndroid) {
-                              url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                              if (await canLaunch(url)) {
-                                await launch(
-                                  url,
-                                  forceSafariVC: true,
-                                  forceWebView: true,
-                                  enableJavaScript: true,
-                                );
-                              }
-                            } else {
-                              url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                              try {
-                                await launch(
-                                  url,
-                                  forceSafariVC: true,
-                                  forceWebView: true,
-                                  enableJavaScript: true,
-                                );
-                              } catch (e) {
-                                print(e.toString());
-                              }
-                            }
-                          },
-                          child: Text("제1관 주차장 내부", style: TextStyle(color: Colors.blue),),
-                        ),
-                        GestureDetector(
-                          onTap: () async {
-                            String url;
-                            if (Platform.isAndroid) {
-                              url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                              if (await canLaunch(url)) {
-                                await launch(
-                                  url,
-                                  forceSafariVC: true,
-                                  forceWebView: true,
-                                  enableJavaScript: true,
-                                );
-                              }
-                            } else {
-                              url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                              try {
-                                await launch(
-                                  url,
-                                  forceSafariVC: true,
-                                  forceWebView: true,
-                                  enableJavaScript: true,
-                                );
-                              } catch (e) {
-                                print(e.toString());
-                              }
-                            }
-                          },
-                          child: Text("제2관 터미널", style: TextStyle(color: Colors.blue),),
-                        ),
-                        GestureDetector(
-                          onTap: () async {
-                            String url;
-                            if (Platform.isAndroid) {
-                              url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                              if (await canLaunch(url)) {
-                                await launch(
-                                  url,
-                                  forceSafariVC: true,
-                                  forceWebView: true,
-                                  enableJavaScript: true,
-                                );
-                              }
-                            } else {
-                              url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                              try {
-                                await launch(
-                                  url,
-                                  forceSafariVC: true,
-                                  forceWebView: true,
-                                  enableJavaScript: true,
-                                );
-                              } catch (e) {
-                                print(e.toString());
-                              }
-                            }
-                          },
-                          child: Text("외부", style: TextStyle(color: Colors.blue),),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ListTile(
-                    title: Text('앱 사용법', style: TextStyle(fontWeight: FontWeight.bold),),
-                    leading: Icon(Icons.announcement),
-                  ),
-                  Container(
-                    color: Colors.grey[100],
-                    padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        GestureDetector(
-                          onTap: () async {
-                            String url;
-                            if (Platform.isAndroid) {
-                              url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                              if (await canLaunch(url)) {
-                                await launch(
-                                  url,
-                                  forceSafariVC: true,
-                                  forceWebView: true,
-                                  enableJavaScript: true,
-                                );
-                              }
-                            } else {
-                              url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                              try {
-                                await launch(
-                                  url,
-                                  forceSafariVC: true,
-                                  forceWebView: true,
-                                  enableJavaScript: true,
-                                );
-                              } catch (e) {
-                                print(e.toString());
-                              }
-                            }
-                          },
-                          child: Text("대회장으로", style: TextStyle(color: Colors.blue),),
-                        ),
-                        GestureDetector(
-                          onTap: () async {
-                            String url;
-                            if (Platform.isAndroid) {
-                              url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                              if (await canLaunch(url)) {
-                                await launch(
-                                  url,
-                                  forceSafariVC: true,
-                                  forceWebView: true,
-                                  enableJavaScript: true,
-                                );
-                              }
-                            } else {
-                              url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                              try {
-                                await launch(
-                                  url,
-                                  forceSafariVC: true,
-                                  forceWebView: true,
-                                  enableJavaScript: true,
-                                );
-                              } catch (e) {
-                                print(e.toString());
-                              }
-                            }
-                          },
-                          child: Text("집으로", style: TextStyle(color: Colors.blue),),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ListTile(
-                    title: Text('참고', style: TextStyle(fontWeight: FontWeight.bold),),
-                    leading: Icon(Icons.insert_drive_file),
-                  ),
-                  Container(
-                    color: Colors.grey[100],
-                    padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        GestureDetector(
-                          onTap: () async {
-                            String url;
-                            if (Platform.isAndroid) {
-                              url = "https://jw2019.org";
-                              if (await canLaunch(url)) {
-                                await launch(
-                                  url,
-                                  forceSafariVC: true,
-                                  forceWebView: true,
-                                  enableJavaScript: true,
-                                );
-                              }
-                            } else {
-                              url = "https://jw2019.org";
-                              try {
-                                await launch(
-                                  url,
-                                  forceSafariVC: true,
-                                  forceWebView: true,
-                                  enableJavaScript: true,
-                                );
-                              } catch (e) {
-                                print(e.toString());
-                              }
-                            }
-                          },
-                          child: Text("jw2019.org", style: TextStyle(color: Colors.blue),),
-                        ),
-                        GestureDetector(
-                          onTap: () async {
-                            String url;
-                            if (Platform.isAndroid) {
-                              url = "https://blog.naver.com/hyla981020/221505617243";
-                              if (await canLaunch(url)) {
-                                await launch(
-                                  url,
-                                  forceSafariVC: true,
-                                  forceWebView: true,
-                                  enableJavaScript: true,
-                                );
-                              }
-                            } else {
-                              url = "https://blog.naver.com/hyla981020/221505617243";
-                              try {
-                                await launch(
-                                  url,
-                                  forceSafariVC: true,
-                                  forceWebView: true,
-                                  enableJavaScript: true,
-                                );
-                              } catch (e) {
-                                print(e.toString());
-                              }
-                            }
-                          },
-                          child: Text("개인정보취급방침", style: TextStyle(color: Colors.blue),),
-                        ),
-                      ],
-                    ),
-                  ),
+                  Text("서버 일시 오류", textAlign: TextAlign.center,),
                   Container(
                     padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
                     child: RaisedButton(
@@ -667,45 +739,6 @@ class _MyAppState extends State<SendApp> {
                       child: new Text('로그아웃',
                           style: new TextStyle(fontSize: 20.0, color: Colors.white)),
                     ),
-                  ),
-
-                  Row(
-                      children: <Widget>[
-                        Expanded(
-                            child: Divider(height: 5, color: Colors.black,)
-                        ),
-                      ]
-                  ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
-                    child: RaisedButton(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                      onPressed: () {
-                        _change();
-                      },
-                      child: new Text('비밀번호 변경',
-                          style: new TextStyle(fontSize: 20.0, color: Colors.green[900])),
-                    ),
-                  ),
-                ],
-              );
-            } else {
-              return new ListView(
-                // Important: Remove any padding from the ListView.
-                padding: EdgeInsets.zero,
-                children: <Widget>[
-                  Container(
-                    height: 90.0,
-                    child: DrawerHeader(
-                      child:  Text("2019SIC 주차 지원", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20,),),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    title: Text("로딩중입니다..."),
                   ),
                 ],
               );
@@ -732,7 +765,7 @@ class _MyAppState extends State<SendApp> {
             child: Row(
               children: <Widget>[
                 Expanded(
-                  child: Text(info['bus_name'] + "/" + "차량1" + "/" + info['bus_guide_name'] + "/" + info['bus_guide_phone'], style: TextStyle(fontSize: 13.0),),
+                  child: Text((info['bus_name'] ?? "") + "/" + "차량1" + "/" + (info['bus_guide_name'] ?? "") + "/" + (info['bus_guide_phone'] ?? ""), style: TextStyle(fontSize: 13.0),),
                 ),
                 Container(
                   alignment: Alignment.centerRight,
@@ -764,7 +797,7 @@ class _MyAppState extends State<SendApp> {
             child: Row(
               children: <Widget>[
                 Expanded(
-                  child: Text("버스정보 : " + info['bus_number'] + " (" + info['bus_driver_phone'] + ")", style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),),
+                  child: Text("버스정보 : " + (info['bus_number'] ?? "") + " (" + (info['bus_driver_phone'] ?? "") + ")", style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),),
                 ),
                 Container(
                   alignment: Alignment.centerRight,
@@ -904,9 +937,33 @@ class _MyAppState extends State<SendApp> {
             child: Text("버스 이용 확인", style: TextStyle(fontWeight: FontWeight.bold,),),
           ),
           depart(),
+          (confirm1 && !confirm2) ? FadeTransition(
+            opacity: _animationController,
+            child: Icon(Icons.arrow_downward, color:  Colors.yellow[900],),
+          ) : Container(
+            child: Icon(Icons.arrow_downward, color: !confirm2 ?  Colors.red[900] : Colors.green[900],),
+          ),
           middle(),
+          (confirm2 && !confirm3) ? FadeTransition(
+            opacity: _animationController,
+            child: Icon(Icons.arrow_downward, color:  Colors.yellow[900],),
+          ) : Container(
+            child: Icon(Icons.arrow_downward, color: !confirm3 ?  Colors.red[900] : Colors.green[900],),
+          ),
           arrive(),
+          (confirm3 && !confirm4) ? FadeTransition(
+            opacity: _animationController,
+            child: Icon(Icons.arrow_downward, color:  Colors.yellow[900],),
+          ) : Container(
+            child: Icon(Icons.arrow_downward, color: !confirm4 ?  Colors.red[900] : Colors.green[900],),
+          ),
           terminalArrive(),
+          (confirm4 && !confirm5) ? FadeTransition(
+            opacity: _animationController,
+            child: Icon(Icons.arrow_downward, color:  Colors.yellow[900],),
+          ) : Container(
+            child: Icon(Icons.arrow_downward, color: !confirm5 ?  Colors.red[900] : Colors.green[900],),
+          ),
           terminalDepart(),
           finish(),
           Text("\n\n주차 안내부 오용호 : 010-1254-4444\n\n", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
@@ -917,67 +974,88 @@ class _MyAppState extends State<SendApp> {
 
   Widget depart() {
     return Container(
+        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+    child: Container(
       color: !confirm1 ? Colors.grey[100] : Colors.orange[200],
       child: ListTile(
-        title: Text("출발", textAlign: TextAlign.center,),
-        subtitle: Text("버스가 출발하였을 때 누릅니다. \nGPS가 켜져있는지도 확인해주세요.", textAlign: TextAlign.center,),
+        dense: true,
+        leading: Icon(Icons.looks_one, color: !confirm1 ? Colors.red : Colors.green,),
+        title: Text("출발", style: TextStyle(fontSize: 20),),
+        subtitle: Text("버스가 출발하였을 때 자동으로 켜집니다. \nGPS가 켜져있는지도 확인해주세요.",),
         onTap: () {
           !confirm1 ? alert("버스가 출발하였습니까?", 1) : alert("버스가 출발하지 않았습니까?", 6);
         },
       ),
+    ),
     );
   }
 
   Widget middle() {
     return Container(
+        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+    child: Container(
       color: !confirm2 ? Colors.grey[100] : Colors.orange[200],
       child: ListTile(
-        title: Text("1차지점 통과", textAlign: TextAlign.center,),
-        subtitle: Text("1차 지점을 통과하였음에도 \n자동으로 진행이 안 될 때 누릅니다.", textAlign: TextAlign.center,),
+        dense: true,
+        leading: Icon(Icons.looks_two, color: !confirm2 ? Colors.red : Colors.green,),
+        title: Text("1차지점 통과", style: TextStyle(fontSize: 20),),
+        subtitle: Text("1차 지점을 통과하였음에도 자동으로 진행이 안 될 때 누릅니다.",),
         onTap: () {
           !confirm2 ? alert("버스가 1차지점을 통과하였습니까?", 2) : alert("버스가 아직 1차지점을 출발하지 않았습니까?", 7);
         },
       ),
-    );
+    ),);
   }
 
   Widget arrive() {
     return Container(
+        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+    child: Container(
       color: !confirm3 ? Colors.grey[100] : Colors.orange[200],
       child: ListTile(
-        title: Text("2차 지점 통과, 도착(예정)", textAlign: TextAlign.center,),
-        subtitle: Text("2차 지점을 통과하였음에도 \n자동으로 진행이 안 될 때 누릅니다.", textAlign: TextAlign.center,),
+        dense: true,
+        leading: Icon(Icons.looks_3, color: !confirm3 ? Colors.red : Colors.green,),
+        title: Text("2차 지점 통과, 도착(예정)", style: TextStyle(fontSize: 20),),
+        subtitle: Text("2차 지점을 통과하였음에도 자동으로 진행이 안 될 때 누릅니다.",),
         onTap: () {
           !confirm3 ? alert("버스가 2차 지점을 통과하였거나, 킨텍스 근처에 성공적으로 도착하셨습니까?", 3) : alert("버스가 아직 2차 지점이나 근처에 도착하지 않았습니까?", 8);
         },
       ),
-    );
+    ),);
   }
 
   Widget terminalArrive() {
     return Container(
+        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+    child: Container(
       color: !confirm4 ? Colors.grey[100] : Colors.orange[200],
-      child: ListTile( // check -> confirm
-        title: Text("터미널도착", textAlign: TextAlign.center,),
-        subtitle: Text("터미널에 도착하였을 때 누릅니다.", textAlign: TextAlign.center,),
+      child: ListTile(
+        dense: true,
+        leading: Icon(Icons.looks_4, color: !confirm4 ? Colors.red : Colors.green,),
+        title: Text("터미널도착", style: TextStyle(fontSize: 20),),
+        subtitle: Text("터미널에 도착하였을 때 누릅니다.",),
         onTap: () {
           !confirm4 ? alert("버스가 터미널에 정차하였습니까?", 4) : alert("버스가 아직 터미널에 정차하지 않았습니까?", 9);
         },
       ),
-    );
+    ),);
   }
 
   Widget terminalDepart() {
     return Container(
+        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+    child: Container(
       color: !confirm5 ? Colors.grey[100] : Colors.orange[200],
-      child: ListTile( // check -> confirm
-        title: Text("터미널출발", textAlign: TextAlign.center,),
-        subtitle: Text("모두 하차하고, 버스가 터미널을 떠날 때 누릅니다.", textAlign: TextAlign.center,),
+      child: ListTile(
+        dense: true,
+        leading: Icon(Icons.looks_5, color: !confirm5 ? Colors.red : Colors.green,),
+        title: Text("터미널출발", style: TextStyle(fontSize: 20),),
+        subtitle: Text("모두 하차하고, 버스가 터미널을 떠날 때 누릅니다.",),
         onTap: () {
           !confirm5 ? alert("버스 승객이 모두 하차하였고, 버스가 터미널을 빠져나왔습니까?", 5) : alert("버스가 아직 터미널을 출발하지 않았습니까?", 10);
         },
       ),
-    );
+    ),);
   }
 
   Widget finish() {
@@ -1012,7 +1090,7 @@ class _MyAppState extends State<SendApp> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("이후 단계가 이미 실행되었습니다. 다음 단계를 먼저 확인해주세요."),
+          title: Text("다음 단계가 이미 실행되었습니다. 다음 단계를 먼저 확인해주세요."),
           actions: <Widget>[
             FlatButton(
               child: Text('네'),
@@ -1143,6 +1221,10 @@ class _MyAppState extends State<SendApp> {
                             _isLoading = false;
                           });
                           success();
+                          if (Platform.isAndroid) {
+                            streamListen.cancel();
+                            location = null;
+                          }
                           try {
                             platform.invokeMethod('stop'); // await
                           } on Exception catch (e) {
