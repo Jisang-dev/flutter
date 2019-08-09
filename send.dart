@@ -140,39 +140,16 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         print('on message $message');
-//        setState(() async {
-//          await Firestore.instance.collection('01').document(_email).get().then((data) {
-//            final cell = Cell.fromSnapshot(data);
-//            check = cell.access;
-//            if (check) {
-//              confirm1 = confirm2 = confirm3 = true;
-//            }
-//          });
-//        });
+        await alertMessage();
+        currentUser();
       },
       onResume: (Map<String, dynamic> message) async {
         print('on resume $message');
-//        setState(() async {
-//          await Firestore.instance.collection('01').document(_email).get().then((data) {
-//            final cell = Cell.fromSnapshot(data);
-//            check = cell.access;
-//            if (check) {
-//              confirm1 = confirm2 = confirm3 = true;
-//            }
-//          });
-//        });
+        currentUser();
       },
       onLaunch: (Map<String, dynamic> message) async {
         print('on launch $message');
-//        setState(() async {
-//          await Firestore.instance.collection('01').document(_email).get().then((data) {
-//            final cell = Cell.fromSnapshot(data);
-//            check = cell.access;
-//            if (check) {
-//              confirm1 = confirm2 = confirm3 = true;
-//            }
-//          });
-//        });
+        currentUser();
       },
     );
     _firebaseMessaging.requestNotificationPermissions(
@@ -206,6 +183,27 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
         });
       });
     });
+  }
+
+  Future<void> alertMessage() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("진행상태가 갱신되었습니다."),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('네'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                currentUser();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void background(String latlang) async {
@@ -882,7 +880,7 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
             child: Row(
               children: <Widget>[
                 Expanded(
-                  child: Text("주차장(터미널) 정보", style: TextStyle(fontSize: 14.0,),),
+                  child: Text("터미널(주차장) 정보", style: TextStyle(fontSize: 14.0,),),
                 ),
                 Expanded(
                   child: Text("제1관 터미널", style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.pink),),
@@ -1032,10 +1030,10 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
       child: ListTile(
         dense: true,
         leading: Icon(Icons.looks_4, color: !confirm4 ? Colors.red : Colors.green,),
-        title: Text("터미널도착", style: TextStyle(fontSize: 20),),
-        subtitle: Text("터미널에 도착하였을 때 누릅니다.",),
+        title: Text("터미널(주차장) 도착", style: TextStyle(fontSize: 20),),
+        subtitle: Text("터미널(주차장)에 도착하였을 때 누릅니다.",),
         onTap: () {
-          !confirm4 ? alert("버스가 터미널에 정차하였습니까?", 4) : alert("버스가 아직 터미널에 정차하지 않았습니까?", 9);
+          !confirm4 ? alert("버스가 터미널(주차장)에 정차하였습니까?", 4) : alert("버스가 아직 터미널(주차장)에 정차하지 않았습니까?", 9);
         },
       ),
     ),);
@@ -1049,10 +1047,10 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
       child: ListTile(
         dense: true,
         leading: Icon(Icons.looks_5, color: !confirm5 ? Colors.red : Colors.green,),
-        title: Text("터미널출발", style: TextStyle(fontSize: 20),),
-        subtitle: Text("모두 하차하고, 버스가 터미널을 떠날 때 누릅니다.",),
+        title: Text("터미널(주차장)출발", style: TextStyle(fontSize: 20),),
+        subtitle: Text("모두 하차하고, 버스가 터미널(주차장)을 떠날 때 누릅니다.",),
         onTap: () {
-          !confirm5 ? alert("버스 승객이 모두 하차하였고, 버스가 터미널을 빠져나왔습니까?", 5) : alert("버스가 아직 터미널을 출발하지 않았습니까?", 10);
+          !confirm5 ? alert("버스 승객이 모두 하차하였고, 버스가 터미널(주차장)을 빠져나왔습니까?", 5) : alert("버스가 아직 터미널(주차장)을 출발하지 않았습니까?", 10);
         },
       ),
     ),);

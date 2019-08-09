@@ -750,7 +750,7 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
             child: Row(
               children: <Widget>[
                 Expanded(
-                  child: Text("주차장(터미널) 정보", style: TextStyle(fontSize: 14.0,),),
+                  child: Text("터미널(주차장) 정보", style: TextStyle(fontSize: 14.0,),),
                 ),
                 Expanded(
                   child: Text("제1관 터미널", style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.pink),),
