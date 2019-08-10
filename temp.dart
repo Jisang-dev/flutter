@@ -128,7 +128,7 @@ class _MyHomePageState extends State<TempPage> {
             _showEmailInput(),
             _showPasswordInput(),
             _submit(),
-            Text("\n\n주차 안내부 오용호 : 010-1254-4444", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
+            Text("\n\n주차 안내부 : 010-5613-1935", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
           ],
         ),
       ),

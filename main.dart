@@ -8,12 +8,15 @@ import 'dart:convert';
 import 'package:pdsample/init.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:package_info/package_info.dart';
 
 void main() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
+
   await prefs.setString('token', null);
   String id = prefs.getString('id');
   String pw = prefs.getString('pw');
+
   await fetchPost(id, pw).then((post) async {
     if (post.ok) {
       await prefs.setString('id', id);
@@ -34,8 +37,9 @@ void main() async {
     await prefs.setString('pw', null);
     runApp(MyApp());
   });
-
 }
+
+
 
 Future<Post> fetchPost(String id, String pw) async {
   final response = await http.post (
@@ -50,6 +54,17 @@ Future<Post> fetchPost(String id, String pw) async {
     },
   );
   return Post.fromJson(json.decode(response.body));
+}
+
+Future<Map<String, dynamic>> version() async {
+  final response = await http.get (
+    "https://ip2019.tk/guide/version",
+    headers: {
+      "content-type" : "application/json",
+      "accept" : "application/json",
+    },
+  );
+  return json.decode(utf8.decode(response.bodyBytes));
 }
 
 class MyApp extends StatelessWidget {
@@ -98,7 +113,9 @@ class _MyHomePageState extends State<MyHomePage> {
   String _password;
   bool _isLoading = false;
   static const platform = const MethodChannel('sample.hyla981020.com/bg');
+
   SharedPreferences prefs;
+  PackageInfo packageInfo;
 
   @override
   void initState() {
@@ -108,6 +125,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void currentUser() async {
     prefs = await SharedPreferences.getInstance();
+    packageInfo = await PackageInfo.fromPlatform();
+
+    await version().then((data) async {
+      if (data != null && data['reason'] > int.parse(packageInfo.buildNumber)) { // 최근 앱 버전 확인
+        alertMessage();
+      }
+    });
   }
 
   @override
@@ -179,7 +203,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () async {
                 String url;
                 if (Platform.isAndroid) {
-                  url = "https://blog.naver.com/hyla981020/221505617243";
+                  url = "https://blog.naver.com/hyla981020/221612010974";
                   if (await canLaunch(url)) {
                     await launch(
                       url,
@@ -189,7 +213,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   }
                 } else {
-                  url = "https://blog.naver.com/hyla981020/221505617243";
+                  url = "https://blog.naver.com/hyla981020/221612010974";
                   try {
                     await launch(
                       url,
@@ -202,7 +226,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   }
                 }
               },
-              child: Text("개인정보취급방침", style: TextStyle(color: Colors.blue),),
+              child: Text("개인정보처리방침", style: TextStyle(color: Colors.blue),),
             ),
             Text("사용자명과 비밀번호를 분실하였을 경우", textAlign: TextAlign.center,),
             Row(
@@ -210,10 +234,50 @@ class _MyHomePageState extends State<MyHomePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[Text("주차 안내부", style: TextStyle(fontWeight: FontWeight.bold),),Text("로 문의해 주십시오."),],
             ),
-            Text("\n\n주차 안내부 오용호 : 010-1254-4444", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
+            Text("\n\n주차 안내부 : 010-5613-1935", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> alertMessage() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("어플리케이션 업데이트가 필요합니다."),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('네'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                String url;
+                if (Platform.isAndroid) {
+                  url = "https://play.google.com/store/apps/details?id=com.hyla981020.pdsample";
+                  if (await canLaunch(url)) {
+                    await launch(
+                      url,
+                      enableJavaScript: true,
+                    );
+                  }
+                } else {
+                  url = "https://testflight.apple.com/join/4TrWy4Vt";
+                  try {
+                    await launch(
+                      url,
+                      enableJavaScript: true,
+                    );
+                  } catch (e) {
+                    print(e.toString());
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
