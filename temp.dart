@@ -202,6 +202,7 @@ class _MyHomePageState extends State<TempPage> {
         if (data.ok) {
           await prefs.setString('pw', _password);
           await prefs.setString('token', data.token);
+          await prefs.setBool('first', false);
           Navigator.pushReplacement(
             context,
             new MaterialPageRoute(

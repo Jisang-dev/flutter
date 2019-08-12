@@ -325,7 +325,8 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                     onTap: () async {
                       String url;
                       if (Platform.isAndroid) {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                        print(prefs.getString('token'));
+                        url = "https://ip2019.tk/guide/map1t?token=" + prefs.getString('token');
                         if (await canLaunch(url)) {
                           await launch(
                             url,
@@ -335,7 +336,7 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                           );
                         }
                       } else {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                        url = "https://ip2019.tk/guide/map1t?token=" + prefs.getString('token');
                         try {
                           await launch(
                             url,
@@ -354,7 +355,7 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                     onTap: () async {
                       String url;
                       if (Platform.isAndroid) {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                        url = "https://ip2019.tk/guide/map1p?token=" + prefs.getString('token');
                         if (await canLaunch(url)) {
                           await launch(
                             url,
@@ -364,7 +365,7 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                           );
                         }
                       } else {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                        url = "https://ip2019.tk/guide/map1p?token=" + prefs.getString('token');
                         try {
                           await launch(
                             url,
@@ -383,7 +384,7 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                     onTap: () async {
                       String url;
                       if (Platform.isAndroid) {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                        url = "https://ip2019.tk/guide/map2t?token=" + prefs.getString('token');
                         if (await canLaunch(url)) {
                           await launch(
                             url,
@@ -393,7 +394,7 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                           );
                         }
                       } else {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                        url = "https://ip2019.tk/guide/map2t?token=" + prefs.getString('token');
                         try {
                           await launch(
                             url,
@@ -412,7 +413,7 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                     onTap: () async {
                       String url;
                       if (Platform.isAndroid) {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                        url = "https://ip2019.tk/guide/map12ex?token=" + prefs.getString('token');
                         if (await canLaunch(url)) {
                           await launch(
                             url,
@@ -422,7 +423,7 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                           );
                         }
                       } else {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                        url = "https://ip2019.tk/guide/map12ex?token=" + prefs.getString('token');
                         try {
                           await launch(
                             url,
@@ -435,7 +436,36 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                         }
                       }
                     },
-                    child: Text("외부", style: TextStyle(color: Colors.blue),),
+                    child: Text("외부 1~2 주차장", style: TextStyle(color: Colors.blue),),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      String url;
+                      if (Platform.isAndroid) {
+                        url = "https://ip2019.tk/guide/map35ex?token=" + prefs.getString('token');
+                        if (await canLaunch(url)) {
+                          await launch(
+                            url,
+                            forceSafariVC: true,
+                            forceWebView: true,
+                            enableJavaScript: true,
+                          );
+                        }
+                      } else {
+                        url = "https://ip2019.tk/guide/map35ex?token=" + prefs.getString('token');
+                        try {
+                          await launch(
+                            url,
+                            forceSafariVC: true,
+                            forceWebView: true,
+                            enableJavaScript: true,
+                          );
+                        } catch (e) {
+                          print(e.toString());
+                        }
+                      }
+                    },
+                    child: Text("외부 3~5 주차장", style: TextStyle(color: Colors.blue),),
                   ),
                 ],
               ),
@@ -549,6 +579,35 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                       }
                     },
                     child: Text("jw2019.org", style: TextStyle(color: Colors.blue),),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      String url;
+                      if (Platform.isAndroid) {
+                        url = "https://jw2019seoul.org/park";
+                        if (await canLaunch(url)) {
+                          await launch(
+                            url,
+                            forceSafariVC: true,
+                            forceWebView: true,
+                            enableJavaScript: true,
+                          );
+                        }
+                      } else {
+                        url = "https://jw2019seoul.org/park";
+                        try {
+                          await launch(
+                            url,
+                            forceSafariVC: true,
+                            forceWebView: true,
+                            enableJavaScript: true,
+                          );
+                        } catch (e) {
+                          print(e.toString());
+                        }
+                      }
+                    },
+                    child: Text("jw2019seoul.org/park", style: TextStyle(color: Colors.blue),),
                   ),
                   GestureDetector(
                     onTap: () async {
@@ -735,9 +794,8 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       color: Colors.blue,
                       onPressed: () async {
-                        String url;
+                        String url = "https://ip2019.tk/guide/map1t?token=" + prefs.getString('token');
                         if (Platform.isAndroid) {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
                           if (await canLaunch(url)) {
                             await launch(
                               url,
@@ -747,7 +805,6 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                             );
                           }
                         } else {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
                           try {
                             await launch(
                               url,
@@ -833,7 +890,7 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
         child: ListTile(
           dense: true,
           leading: Icon(Icons.looks_two, color: !confirm2 ? Colors.red : Colors.green,),
-          title: Text("요청 승인, 위치 확인", style: TextStyle(fontSize: 20),),
+          title: Text("요청 승인", style: TextStyle(fontSize: 20),),
           subtitle: Text("주차부에서 요청을 승인할 때 자동으로 켜집니다.",),
           onTap: () {
             setState(() {
@@ -853,8 +910,8 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
         child: ListTile(
           dense: true,
           leading: Icon(Icons.looks_3, color: !confirm3 ? Colors.red : Colors.green,),
-          title: Text("터미널도착", style: TextStyle(fontSize: 20),),
-          subtitle: Text("터미널에 버스가 도착할 때 누릅니다.",),
+          title: Text("터미널도착, 위치 확인", style: TextStyle(fontSize: 20),),
+          subtitle: Text("터미널에 버스가 도착할 때 자동으로 켜집니다. 버스의 상세위치도 확인 가능합니다.",),
           onTap: () {
             !confirm3 ? alert("버스가 터미널에 정차하였습니까?", 2) : alert("버스가 아직 터미널에 정차하지 않았습니까?", 7);
           },

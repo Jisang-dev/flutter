@@ -88,6 +88,7 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
   int _count = 0;
 
   Future<void> _setBackground() async { // for iOS and androidOS
+    _count = 0;
     try {
       await platform.invokeMethod('initLocation');
     } on Exception catch (e) {
@@ -126,16 +127,6 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
     super.initState();
     currentUser();
     timestamp = (Platform.isAndroid ? Timestamp.fromDate(DateTime.now()).millisecondsSinceEpoch : Timestamp.fromDate(DateTime.now()).seconds);
-
-    platform.setMethodCallHandler((call) {
-      if (call.method == "background") {
-        background(call.arguments);
-      }
-    });
-    if (Platform.isAndroid) {
-      sample();
-    }
-    _setBackground();
 
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
@@ -401,7 +392,8 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
                     onTap: () async {
                       String url;
                       if (Platform.isAndroid) {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                        print(prefs.getString('token'));
+                        url = "https://ip2019.tk/guide/map1t?token=" + prefs.getString('token');
                         if (await canLaunch(url)) {
                           await launch(
                             url,
@@ -411,7 +403,7 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
                           );
                         }
                       } else {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                        url = "https://ip2019.tk/guide/map1t?token=" + prefs.getString('token');
                         try {
                           await launch(
                             url,
@@ -430,7 +422,7 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
                     onTap: () async {
                       String url;
                       if (Platform.isAndroid) {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                        url = "https://ip2019.tk/guide/map1p?token=" + prefs.getString('token');
                         if (await canLaunch(url)) {
                           await launch(
                             url,
@@ -440,7 +432,7 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
                           );
                         }
                       } else {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                        url = "https://ip2019.tk/guide/map1p?token=" + prefs.getString('token');
                         try {
                           await launch(
                             url,
@@ -459,7 +451,7 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
                     onTap: () async {
                       String url;
                       if (Platform.isAndroid) {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                        url = "https://ip2019.tk/guide/map2t?token=" + prefs.getString('token');
                         if (await canLaunch(url)) {
                           await launch(
                             url,
@@ -469,7 +461,7 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
                           );
                         }
                       } else {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                        url = "https://ip2019.tk/guide/map2t?token=" + prefs.getString('token');
                         try {
                           await launch(
                             url,
@@ -488,7 +480,7 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
                     onTap: () async {
                       String url;
                       if (Platform.isAndroid) {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                        url = "https://ip2019.tk/guide/map12ex?token=" + prefs.getString('token');
                         if (await canLaunch(url)) {
                           await launch(
                             url,
@@ -498,7 +490,7 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
                           );
                         }
                       } else {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                        url = "https://ip2019.tk/guide/map12ex?token=" + prefs.getString('token');
                         try {
                           await launch(
                             url,
@@ -511,7 +503,36 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
                         }
                       }
                     },
-                    child: Text("외부", style: TextStyle(color: Colors.blue),),
+                    child: Text("외부 1~2 주차장", style: TextStyle(color: Colors.blue),),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      String url;
+                      if (Platform.isAndroid) {
+                        url = "https://ip2019.tk/guide/map35ex?token=" + prefs.getString('token');
+                        if (await canLaunch(url)) {
+                          await launch(
+                            url,
+                            forceSafariVC: true,
+                            forceWebView: true,
+                            enableJavaScript: true,
+                          );
+                        }
+                      } else {
+                        url = "https://ip2019.tk/guide/map35ex?token=" + prefs.getString('token');
+                        try {
+                          await launch(
+                            url,
+                            forceSafariVC: true,
+                            forceWebView: true,
+                            enableJavaScript: true,
+                          );
+                        } catch (e) {
+                          print(e.toString());
+                        }
+                      }
+                    },
+                    child: Text("외부 3~5 주차장", style: TextStyle(color: Colors.blue),),
                   ),
                 ],
               ),
@@ -625,6 +646,35 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
                       }
                     },
                     child: Text("jw2019.org", style: TextStyle(color: Colors.blue),),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      String url;
+                      if (Platform.isAndroid) {
+                        url = "https://jw2019seoul.org/park";
+                        if (await canLaunch(url)) {
+                          await launch(
+                            url,
+                            forceSafariVC: true,
+                            forceWebView: true,
+                            enableJavaScript: true,
+                          );
+                        }
+                      } else {
+                        url = "https://jw2019seoul.org/park";
+                        try {
+                          await launch(
+                            url,
+                            forceSafariVC: true,
+                            forceWebView: true,
+                            enableJavaScript: true,
+                          );
+                        } catch (e) {
+                          print(e.toString());
+                        }
+                      }
+                    },
+                    child: Text("jw2019seoul.org/park", style: TextStyle(color: Colors.blue),),
                   ),
                   GestureDetector(
                     onTap: () async {
@@ -811,9 +861,8 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       color: Colors.blue,
                       onPressed: () async {
-                        String url;
+                        String url = "https://ip2019.tk/guide/map1t?token=" + prefs.getString('token');
                         if (Platform.isAndroid) {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
                           if (await canLaunch(url)) {
                             await launch(
                               url,
@@ -823,7 +872,6 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
                             );
                           }
                         } else {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
                           try {
                             await launch(
                               url,
@@ -865,9 +913,8 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       color: Colors.blue,
                       onPressed: () async {
-                        String url;
+                        String url = "https://ip2019.tk/guide/map1t?token=" + prefs.getString('token');
                         if (Platform.isAndroid) {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
                           if (await canLaunch(url)) {
                             await launch(
                               url,
@@ -877,7 +924,6 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
                             );
                           }
                         } else {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
                           try {
                             await launch(
                               url,
@@ -1123,6 +1169,15 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
                           confirm1 = true;
                           _isLoading = false;
                         });
+                        platform.setMethodCallHandler((call) {
+                          if (call.method == "background") {
+                            background(call.arguments);
+                          }
+                        });
+                        if (Platform.isAndroid) {
+                          sample();
+                        }
+                        _setBackground();
                         success();
                       }
                     });
@@ -1216,6 +1271,15 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
                             confirm1 = false;
                             _isLoading = false;
                           });
+                          if (Platform.isAndroid) {
+                            streamListen.cancel();
+                            location = null;
+                          }
+                          try {
+                            platform.invokeMethod('stop'); // await
+                          } on Exception catch (e) {
+                            e.toString();
+                          }
                           success();
                         }
                       });

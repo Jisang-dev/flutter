@@ -22,10 +22,10 @@ void main() async {
       await prefs.setString('id', id);
       await prefs.setString('pw', pw);
       await prefs.setString('token', post.token);
-      if (pw != "1234") {
+      if (prefs.containsKey('first')) { // 초기에 앱을 설치할 때에만 tempapp으로 이동
         runApp(InitApp());
       } else {
-        runApp(TempApp()); /// TempApp()으로 교체
+        runApp(TempApp());
       }
     } else {
       await prefs.setString('id', null);
@@ -346,8 +346,33 @@ class _MyHomePageState extends State<MyHomePage> {
       child: RaisedButton(
         color: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        onPressed: () {print("Hello world");},
-        child: new Text('둘러보기',
+        onPressed: () async {
+          String url;
+          if (Platform.isAndroid) {
+            url = "https://www.jw2019seoul.org/park";
+            if (await canLaunch(url)) {
+              await launch(
+                url,
+                forceSafariVC: true,
+                forceWebView: true,
+                enableJavaScript: true,
+              );
+            }
+          } else {
+            url = "https://www.jw2019seoul.org/park";
+            try {
+              await launch(
+                url,
+                forceSafariVC: true,
+                forceWebView: true,
+                enableJavaScript: true,
+              );
+            } catch (e) {
+              print(e.toString());
+            }
+          }
+        },
+        child: new Text('웹사이트 둘러보기',
             style: new TextStyle(fontSize: 20.0, color: Colors.green[900])),
       ),
     );
@@ -365,7 +390,7 @@ class _MyHomePageState extends State<MyHomePage> {
           print(await prefs.setString('id', _email));
           await prefs.setString('pw', _password);
           await prefs.setString('token', post.token);
-          if (_password != "1234") {
+          if (prefs.containsKey('first')) { // 초기에 앱을 설치할 때에만 tempapp으로 이동
             Navigator.pushReplacement(
               context,
               new MaterialPageRoute(
@@ -380,7 +405,6 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             );
           }
-
         } else {
           alert("아이디나 비밀번호를 다시 확인해주세요");
           setState(() {

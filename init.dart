@@ -206,7 +206,8 @@ class _MyAppState extends State<InitPage> {
                       onTap: () async {
                         String url;
                         if (Platform.isAndroid) {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                          print(prefs.getString('token'));
+                          url = "https://ip2019.tk/guide/map1t?token=" + prefs.getString('token');
                           if (await canLaunch(url)) {
                             await launch(
                               url,
@@ -216,7 +217,7 @@ class _MyAppState extends State<InitPage> {
                             );
                           }
                         } else {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                          url = "https://ip2019.tk/guide/map1t?token=" + prefs.getString('token');
                           try {
                             await launch(
                               url,
@@ -235,7 +236,7 @@ class _MyAppState extends State<InitPage> {
                       onTap: () async {
                         String url;
                         if (Platform.isAndroid) {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                          url = "https://ip2019.tk/guide/map1p?token=" + prefs.getString('token');
                           if (await canLaunch(url)) {
                             await launch(
                               url,
@@ -245,7 +246,7 @@ class _MyAppState extends State<InitPage> {
                             );
                           }
                         } else {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                          url = "https://ip2019.tk/guide/map1p?token=" + prefs.getString('token');
                           try {
                             await launch(
                               url,
@@ -264,7 +265,7 @@ class _MyAppState extends State<InitPage> {
                       onTap: () async {
                         String url;
                         if (Platform.isAndroid) {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                          url = "https://ip2019.tk/guide/map2t?token=" + prefs.getString('token');
                           if (await canLaunch(url)) {
                             await launch(
                               url,
@@ -274,7 +275,7 @@ class _MyAppState extends State<InitPage> {
                             );
                           }
                         } else {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                          url = "https://ip2019.tk/guide/map2t?token=" + prefs.getString('token');
                           try {
                             await launch(
                               url,
@@ -293,7 +294,7 @@ class _MyAppState extends State<InitPage> {
                       onTap: () async {
                         String url;
                         if (Platform.isAndroid) {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                          url = "https://ip2019.tk/guide/map12ex?token=" + prefs.getString('token');
                           if (await canLaunch(url)) {
                             await launch(
                               url,
@@ -303,7 +304,7 @@ class _MyAppState extends State<InitPage> {
                             );
                           }
                         } else {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+                          url = "https://ip2019.tk/guide/map12ex?token=" + prefs.getString('token');
                           try {
                             await launch(
                               url,
@@ -316,7 +317,36 @@ class _MyAppState extends State<InitPage> {
                           }
                         }
                       },
-                      child: Text("외부", style: TextStyle(color: Colors.blue),),
+                      child: Text("외부 1~2 주차장", style: TextStyle(color: Colors.blue),),
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        String url;
+                        if (Platform.isAndroid) {
+                          url = "https://ip2019.tk/guide/map35ex?token=" + prefs.getString('token');
+                          if (await canLaunch(url)) {
+                            await launch(
+                              url,
+                              forceSafariVC: true,
+                              forceWebView: true,
+                              enableJavaScript: true,
+                            );
+                          }
+                        } else {
+                          url = "https://ip2019.tk/guide/map35ex?token=" + prefs.getString('token');
+                          try {
+                            await launch(
+                              url,
+                              forceSafariVC: true,
+                              forceWebView: true,
+                              enableJavaScript: true,
+                            );
+                          } catch (e) {
+                            print(e.toString());
+                          }
+                        }
+                      },
+                      child: Text("외부 3~5 주차장", style: TextStyle(color: Colors.blue),),
                     ),
                   ],
                 ),
@@ -430,6 +460,35 @@ class _MyAppState extends State<InitPage> {
                         }
                       },
                       child: Text("jw2019.org", style: TextStyle(color: Colors.blue),),
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        String url;
+                        if (Platform.isAndroid) {
+                          url = "https://jw2019seoul.org/park";
+                          if (await canLaunch(url)) {
+                            await launch(
+                              url,
+                              forceSafariVC: true,
+                              forceWebView: true,
+                              enableJavaScript: true,
+                            );
+                          }
+                        } else {
+                          url = "https://jw2019seoul.org/park";
+                          try {
+                            await launch(
+                              url,
+                              forceSafariVC: true,
+                              forceWebView: true,
+                              enableJavaScript: true,
+                            );
+                          } catch (e) {
+                            print(e.toString());
+                          }
+                        }
+                      },
+                      child: Text("jw2019seoul.org/park", style: TextStyle(color: Colors.blue),),
                     ),
                     GestureDetector(
                       onTap: () async {
@@ -598,7 +657,9 @@ class _MyAppState extends State<InitPage> {
                   }).toList(),
                   value: _commitDate,
                   onChanged: (value) {
-                    _commitDate = value;
+                    setState(() {
+                      _commitDate = value;
+                    });
                   },
                 ),
                 Radio(
