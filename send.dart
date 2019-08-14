@@ -118,7 +118,7 @@ class _MyAppState extends State<SendApp> with TickerProviderStateMixin {
     _animationController.repeat();
     super.initState();
     currentUser();
-    timestamp = (Platform.isAndroid ? DateTime.now().millisecondsSinceEpoch : DateTime.now().millisecondsSinceEpoch / 1000);
+    timestamp = (Platform.isAndroid ? DateTime.now().millisecondsSinceEpoch : 0);
 
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
