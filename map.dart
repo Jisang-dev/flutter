@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
-import 'dart:math';
+import 'dart:io';
+import 'package:flutter/services.dart';
+import 'package:pdsample/init.dart';
 
 class Maps extends StatefulWidget {
   Maps({Key key, this.title}) : super(key: key);
@@ -50,8 +52,6 @@ class _MyHomePageState extends State<Maps> {
       x += value.position.dx - preX - (value.scale - preScale) * temp.dx * 7;
       y -= value.position.dy - preY + (value.scale - preScale) * temp.dy * 7;
     });
-    print(x);
-    print(y);
     preScale = value.scale;
     preX = value.position.dx;
     preY = value.position.dy;
@@ -105,6 +105,128 @@ class _MyHomePageState extends State<Maps> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+class TerminateApp extends StatelessWidget {
+// This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+      title: '2019 국제대회 주차부',
+      theme: new ThemeData(
+// This is the theme of your application.
+//
+// Try running your application with "flutter run". You'll see the
+// application has a blue toolbar. Then, without quitting the app, try
+// changing the primarySwatch below to Colors.green and then invoke
+// "hot reload" (press "r" in the console where you ran "flutter run",
+// or press Run > Flutter Hot Reload in IntelliJ). Notice that the
+// counter didn't reset back to zero; the application is not restarted.
+        primaryColor: Colors.green[900],
+      ),
+      home: new TerminatePage(title: '주차부 버스 인솔자용',),
+    );
+  }
+}
+
+class TerminatePage extends StatefulWidget {
+  TerminatePage({Key key, this.title}) : super(key: key);
+
+  final String title;
+
+  @override
+  _TerminateState createState() => new _TerminateState();
+}
+
+class _TerminateState extends State<TerminatePage> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+        appBar: AppBar(
+          title: Text('종료', style: TextStyle(fontWeight: FontWeight.bold,),),
+        ),
+        body: Container(
+          alignment: Alignment.center,
+          padding: EdgeInsets.all(20.0),
+          decoration: BoxDecoration(
+            image: DecorationImage(image: AssetImage("assets/jwmain.png"), fit: BoxFit.cover),
+          ),
+          child: Stack(
+            children: <Widget>[
+              _showBody(),
+            ],
+          ),
+        )
+    );
+  }
+
+  Widget _showBody() {
+    return new Center(
+      child: Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          backgroundBlendMode: BlendMode.softLight,
+          color: Colors.white,
+        ),
+        child: ListView(
+          shrinkWrap: true,
+          children: <Widget>[
+            _showImage(),
+            Padding(padding: const EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 0.0),),
+            Text("모든 과정이 완료되었습니다. 수고하셨습니다!",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.green[900], fontWeight: FontWeight.bold),
+            ),
+            Padding(padding: const EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 0.0),),
+            Text(Platform.isAndroid ? "아래 버튼을 누르시면 앱이 종료됩니다." : "아래 버튼을 누르시면 초기화면으로 돌아갑니다.",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.green[900], fontWeight: FontWeight.bold),
+            ),
+            _submit(),
+            Text("\n\n주차 안내부 : 010-5613-1935", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _showImage() {
+    return Image.asset(
+      'assets/jw2019.png',
+      width: 120,
+      height: 56.875,
+    );
+  }
+
+  Widget _submit() {
+    return new Padding(
+      padding: EdgeInsets.fromLTRB(0.0, 30.0, 0.0, 0.0),
+      child: RaisedButton(
+        color: Colors.green[900],
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        onPressed: () {
+          if (Platform.isAndroid) {
+            SystemNavigator.pop();
+          } else {
+            Navigator.pushReplacement(
+              context,
+              new MaterialPageRoute(
+                  builder: (BuildContext context) => new InitApp()
+              ),
+            );
+          }
+        }, // 안드로이드는 앱 종료 기능, 아이폰은 초기화면으로 넘어가도록 함
+        child: new Text(Platform.isAndroid ? "앱 종료" : "초기화면으로",
+            style: new TextStyle(fontSize: 20.0, color: Colors.white)),
       ),
     );
   }

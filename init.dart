@@ -127,6 +127,7 @@ class _MyAppState extends State<InitPage> {
       if (data != null && data['ok']) {
         setState(() {
           info = data['bus_info'];
+          print(info);
           _guideName = data['bus_info']['bus_guide_name'] ?? "";
           _guideNumber = data['bus_info']['bus_guide_phone'] ?? "";
           _busCode = data['bus_info']['bus_number'] ?? "";
@@ -195,338 +196,79 @@ class _MyAppState extends State<InitPage> {
                 padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
                 child: Text("첫째날(금요일) - 1전시장 터미널" + "\n" + "둘째날(토요일) - 2전시장 터미널" + "\n" + "셋째날(일요일) - 1전시장 터미널"),
               ),
-              ListTile(
-                title: Text('주차장 (준비중)', style: TextStyle(fontWeight: FontWeight.bold),),
-                leading: Icon(Icons.flag),
-              ),
+//              ListTile(
+//                title: Text('앱 사용법 (준비중)', style: TextStyle(fontWeight: FontWeight.bold),),
+//                leading: Icon(Icons.announcement),
+//              ),
+//              Container(
+//                color: Colors.grey[100],
+//                padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+//                child: Column(
+//                  crossAxisAlignment: CrossAxisAlignment.start,
+//                  children: <Widget>[
+//                    GestureDetector(
+//                      onTap: () async {
+//                        String url;
+//                        if (Platform.isAndroid) {
+//                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+//                          if (await canLaunch(url)) {
+//                            await launch(
+//                              url,
+//                              forceSafariVC: true,
+//                              forceWebView: true,
+//                              enableJavaScript: true,
+//                            );
+//                          }
+//                        } else {
+//                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+//                          try {
+//                            await launch(
+//                              url,
+//                              forceSafariVC: true,
+//                              forceWebView: true,
+//                              enableJavaScript: true,
+//                            );
+//                          } catch (e) {
+//                            print(e.toString());
+//                          }
+//                        }
+//                      },
+//                      child: Text("대회장으로", style: TextStyle(color: Colors.blue),),
+//                    ),
+//                    GestureDetector(
+//                      onTap: () async {
+//                        String url;
+//                        if (Platform.isAndroid) {
+//                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+//                          if (await canLaunch(url)) {
+//                            await launch(
+//                              url,
+//                              forceSafariVC: true,
+//                              forceWebView: true,
+//                              enableJavaScript: true,
+//                            );
+//                          }
+//                        } else {
+//                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+//                          try {
+//                            await launch(
+//                              url,
+//                              forceSafariVC: true,
+//                              forceWebView: true,
+//                              enableJavaScript: true,
+//                            );
+//                          } catch (e) {
+//                            print(e.toString());
+//                          }
+//                        }
+//                      },
+//                      child: Text("집으로", style: TextStyle(color: Colors.blue),),
+//                    ),
+//                  ],
+//                ),
+//              ),
               Container(
-                color: Colors.grey[100],
-                padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () async {
-                        String url;
-                        if (Platform.isAndroid) {
-                          print(prefs.getString('token'));
-                          url = "https://ip2019.tk/guide/map1t?token=" + prefs.getString('token');
-                          if (await canLaunch(url)) {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          }
-                        } else {
-                          url = "https://ip2019.tk/guide/map1t?token=" + prefs.getString('token');
-                          try {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          } catch (e) {
-                            print(e.toString());
-                          }
-                        }
-                      },
-                      child: Text("1전시장 터미널", style: TextStyle(color: Colors.blue),),
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        String url;
-                        if (Platform.isAndroid) {
-                          url = "https://ip2019.tk/guide/map1p?token=" + prefs.getString('token');
-                          if (await canLaunch(url)) {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          }
-                        } else {
-                          url = "https://ip2019.tk/guide/map1p?token=" + prefs.getString('token');
-                          try {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          } catch (e) {
-                            print(e.toString());
-                          }
-                        }
-                      },
-                      child: Text("1전시장 주차장 내부", style: TextStyle(color: Colors.blue),),
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        String url;
-                        if (Platform.isAndroid) {
-                          url = "https://ip2019.tk/guide/map2t?token=" + prefs.getString('token');
-                          if (await canLaunch(url)) {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          }
-                        } else {
-                          url = "https://ip2019.tk/guide/map2t?token=" + prefs.getString('token');
-                          try {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          } catch (e) {
-                            print(e.toString());
-                          }
-                        }
-                      },
-                      child: Text("2전시장 터미널", style: TextStyle(color: Colors.blue),),
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        String url;
-                        if (Platform.isAndroid) {
-                          url = "https://ip2019.tk/guide/map12ex?token=" + prefs.getString('token');
-                          if (await canLaunch(url)) {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          }
-                        } else {
-                          url = "https://ip2019.tk/guide/map12ex?token=" + prefs.getString('token');
-                          try {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          } catch (e) {
-                            print(e.toString());
-                          }
-                        }
-                      },
-                      child: Text("외부 1~2 주차장", style: TextStyle(color: Colors.blue),),
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        String url;
-                        if (Platform.isAndroid) {
-                          url = "https://ip2019.tk/guide/map35ex?token=" + prefs.getString('token');
-                          if (await canLaunch(url)) {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          }
-                        } else {
-                          url = "https://ip2019.tk/guide/map35ex?token=" + prefs.getString('token');
-                          try {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          } catch (e) {
-                            print(e.toString());
-                          }
-                        }
-                      },
-                      child: Text("외부 3~5 주차장", style: TextStyle(color: Colors.blue),),
-                    ),
-                  ],
-                ),
-              ),
-              ListTile(
-                title: Text('앱 사용법 (준비중)', style: TextStyle(fontWeight: FontWeight.bold),),
-                leading: Icon(Icons.announcement),
-              ),
-              Container(
-                color: Colors.grey[100],
-                padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () async {
-                        String url;
-                        if (Platform.isAndroid) {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                          if (await canLaunch(url)) {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          }
-                        } else {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                          try {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          } catch (e) {
-                            print(e.toString());
-                          }
-                        }
-                      },
-                      child: Text("대회장으로", style: TextStyle(color: Colors.blue),),
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        String url;
-                        if (Platform.isAndroid) {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                          if (await canLaunch(url)) {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          }
-                        } else {
-                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                          try {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          } catch (e) {
-                            print(e.toString());
-                          }
-                        }
-                      },
-                      child: Text("집으로", style: TextStyle(color: Colors.blue),),
-                    ),
-                  ],
-                ),
-              ),
-              ListTile(
-                title: Text('참고', style: TextStyle(fontWeight: FontWeight.bold),),
-                leading: Icon(Icons.insert_drive_file),
-              ),
-              Container(
-                color: Colors.grey[100],
-                padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () async {
-                        String url;
-                        if (Platform.isAndroid) {
-                          url = "https://jw2019.org";
-                          if (await canLaunch(url)) {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          }
-                        } else {
-                          url = "https://jw2019.org";
-                          try {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          } catch (e) {
-                            print(e.toString());
-                          }
-                        }
-                      },
-                      child: Text("jw2019.org", style: TextStyle(color: Colors.blue),),
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        String url;
-                        if (Platform.isAndroid) {
-                          url = "https://jw2019seoul.org/park";
-                          if (await canLaunch(url)) {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          }
-                        } else {
-                          url = "https://jw2019seoul.org/park";
-                          try {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          } catch (e) {
-                            print(e.toString());
-                          }
-                        }
-                      },
-                      child: Text("jw2019seoul.org/park", style: TextStyle(color: Colors.blue),),
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        String url;
-                        if (Platform.isAndroid) {
-                          url = "https://blog.naver.com/hyla981020/221612010974";
-                          if (await canLaunch(url)) {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          }
-                        } else {
-                          url = "https://blog.naver.com/hyla981020/221612010974";
-                          try {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          } catch (e) {
-                            print(e.toString());
-                          }
-                        }
-                      },
-                      child: Text("개인정보처리방침", style: TextStyle(color: Colors.blue),),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
+                padding: EdgeInsets.fromLTRB(50, 200, 50, 0),
                 child: RaisedButton(
                   color: Colors.green[900],
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),

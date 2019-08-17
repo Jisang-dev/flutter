@@ -190,18 +190,6 @@ class _MyHomePageState extends State<MyHomePage> {
             _showEmailInput(),
             _showPasswordInput(),
             _submit(),
-            Row(
-                children: <Widget>[
-                  Expanded(
-                      child: Divider(height: 36, color: Colors.black,)
-                  ),
-                  Text("  또는  "),
-                  Expanded(
-                      child: Divider(height: 36, color: Colors.black,)
-                  ),
-                ]
-            ),
-            _seeAbove(),
             FlatButton(
               onPressed: () async {
                 String url;
@@ -342,43 +330,6 @@ class _MyHomePageState extends State<MyHomePage> {
               style: new TextStyle(fontSize: 20.0, color: Colors.white)),
         ),
         );
-  }
-  Widget _seeAbove() {
-    return new Padding(
-      padding: EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 0.0),
-      child: RaisedButton(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        onPressed: () async {
-          String url;
-          if (Platform.isAndroid) {
-            url = "https://www.jw2019seoul.org/park";
-            if (await canLaunch(url)) {
-              await launch(
-                url,
-                forceSafariVC: true,
-                forceWebView: true,
-                enableJavaScript: true,
-              );
-            }
-          } else {
-            url = "https://www.jw2019seoul.org/park";
-            try {
-              await launch(
-                url,
-                forceSafariVC: true,
-                forceWebView: true,
-                enableJavaScript: true,
-              );
-            } catch (e) {
-              print(e.toString());
-            }
-          }
-        },
-        child: new Text('웹사이트 둘러보기',
-            style: new TextStyle(fontSize: 20.0, color: Colors.green[900])),
-      ),
-    );
   }
 
   void _validateAndSubmit() async {

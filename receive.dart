@@ -62,6 +62,7 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
   bool confirm1 = false;
   bool confirm2 = false;
   bool confirm3 = false;
+  bool confirm4 = false;
 
   AnimationController _animationController;
 
@@ -90,13 +91,12 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
         });
         // 터미널 도착할 경우
         if (info['bus_step'] == Step.RETURN_END || info['bus_step'] == Step.RETURN_RIDE) {
-          confirm1 = confirm2 = confirm3 = true;
+          confirm1 = confirm2 = confirm3 = confirm4 = true;
         } else if (info['bus_step'] == Step.RETURN_TERMINAL) {
-          confirm1 = confirm2 = true;
+          confirm1 = confirm2 = confirm3 = true;
         } else if (info['bus_step'] == Step.RETURN_CALL) {
-          confirm1 = true;
+          confirm1 = confirm2 = true;
         } else if (info['bus_step'] == Step.RETURN_READY) {
-          print('confirm1');
           confirm1 = true;
         }
       }
@@ -264,338 +264,79 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
               padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
               child: Text("첫째날(금요일) - 1전시장 터미널" + "\n" + "둘째날(토요일) - 2전시장 터미널" + "\n" + "셋째날(일요일) - 1전시장 터미널"),
             ),
-            ListTile(
-              title: Text('주차장 (준비중)', style: TextStyle(fontWeight: FontWeight.bold),),
-              leading: Icon(Icons.flag),
-            ),
+//              ListTile(
+//                title: Text('앱 사용법 (준비중)', style: TextStyle(fontWeight: FontWeight.bold),),
+//                leading: Icon(Icons.announcement),
+//              ),
+//              Container(
+//                color: Colors.grey[100],
+//                padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+//                child: Column(
+//                  crossAxisAlignment: CrossAxisAlignment.start,
+//                  children: <Widget>[
+//                    GestureDetector(
+//                      onTap: () async {
+//                        String url;
+//                        if (Platform.isAndroid) {
+//                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+//                          if (await canLaunch(url)) {
+//                            await launch(
+//                              url,
+//                              forceSafariVC: true,
+//                              forceWebView: true,
+//                              enableJavaScript: true,
+//                            );
+//                          }
+//                        } else {
+//                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+//                          try {
+//                            await launch(
+//                              url,
+//                              forceSafariVC: true,
+//                              forceWebView: true,
+//                              enableJavaScript: true,
+//                            );
+//                          } catch (e) {
+//                            print(e.toString());
+//                          }
+//                        }
+//                      },
+//                      child: Text("대회장으로", style: TextStyle(color: Colors.blue),),
+//                    ),
+//                    GestureDetector(
+//                      onTap: () async {
+//                        String url;
+//                        if (Platform.isAndroid) {
+//                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+//                          if (await canLaunch(url)) {
+//                            await launch(
+//                              url,
+//                              forceSafariVC: true,
+//                              forceWebView: true,
+//                              enableJavaScript: true,
+//                            );
+//                          }
+//                        } else {
+//                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
+//                          try {
+//                            await launch(
+//                              url,
+//                              forceSafariVC: true,
+//                              forceWebView: true,
+//                              enableJavaScript: true,
+//                            );
+//                          } catch (e) {
+//                            print(e.toString());
+//                          }
+//                        }
+//                      },
+//                      child: Text("집으로", style: TextStyle(color: Colors.blue),),
+//                    ),
+//                  ],
+//                ),
+//              ),
             Container(
-              color: Colors.grey[100],
-              padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () async {
-                      String url;
-                      if (Platform.isAndroid) {
-                        print(prefs.getString('token'));
-                        url = "https://ip2019.tk/guide/map1t?token=" + prefs.getString('token');
-                        if (await canLaunch(url)) {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        }
-                      } else {
-                        url = "https://ip2019.tk/guide/map1t?token=" + prefs.getString('token');
-                        try {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        } catch (e) {
-                          print(e.toString());
-                        }
-                      }
-                    },
-                    child: Text("1전시장 터미널", style: TextStyle(color: Colors.blue),),
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      String url;
-                      if (Platform.isAndroid) {
-                        url = "https://ip2019.tk/guide/map1p?token=" + prefs.getString('token');
-                        if (await canLaunch(url)) {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        }
-                      } else {
-                        url = "https://ip2019.tk/guide/map1p?token=" + prefs.getString('token');
-                        try {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        } catch (e) {
-                          print(e.toString());
-                        }
-                      }
-                    },
-                    child: Text("1전시장 주차장 내부", style: TextStyle(color: Colors.blue),),
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      String url;
-                      if (Platform.isAndroid) {
-                        url = "https://ip2019.tk/guide/map2t?token=" + prefs.getString('token');
-                        if (await canLaunch(url)) {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        }
-                      } else {
-                        url = "https://ip2019.tk/guide/map2t?token=" + prefs.getString('token');
-                        try {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        } catch (e) {
-                          print(e.toString());
-                        }
-                      }
-                    },
-                    child: Text("2전시장 터미널", style: TextStyle(color: Colors.blue),),
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      String url;
-                      if (Platform.isAndroid) {
-                        url = "https://ip2019.tk/guide/map12ex?token=" + prefs.getString('token');
-                        if (await canLaunch(url)) {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        }
-                      } else {
-                        url = "https://ip2019.tk/guide/map12ex?token=" + prefs.getString('token');
-                        try {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        } catch (e) {
-                          print(e.toString());
-                        }
-                      }
-                    },
-                    child: Text("외부 1~2 주차장", style: TextStyle(color: Colors.blue),),
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      String url;
-                      if (Platform.isAndroid) {
-                        url = "https://ip2019.tk/guide/map35ex?token=" + prefs.getString('token');
-                        if (await canLaunch(url)) {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        }
-                      } else {
-                        url = "https://ip2019.tk/guide/map35ex?token=" + prefs.getString('token');
-                        try {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        } catch (e) {
-                          print(e.toString());
-                        }
-                      }
-                    },
-                    child: Text("외부 3~5 주차장", style: TextStyle(color: Colors.blue),),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              title: Text('앱 사용법 (준비중)', style: TextStyle(fontWeight: FontWeight.bold),),
-              leading: Icon(Icons.announcement),
-            ),
-            Container(
-              color: Colors.grey[100],
-              padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () async {
-                      String url;
-                      if (Platform.isAndroid) {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                        if (await canLaunch(url)) {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        }
-                      } else {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                        try {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        } catch (e) {
-                          print(e.toString());
-                        }
-                      }
-                    },
-                    child: Text("대회장으로", style: TextStyle(color: Colors.blue),),
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      String url;
-                      if (Platform.isAndroid) {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                        if (await canLaunch(url)) {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        }
-                      } else {
-                        url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-                        try {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        } catch (e) {
-                          print(e.toString());
-                        }
-                      }
-                    },
-                    child: Text("집으로", style: TextStyle(color: Colors.blue),),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              title: Text('참고', style: TextStyle(fontWeight: FontWeight.bold),),
-              leading: Icon(Icons.insert_drive_file),
-            ),
-            Container(
-              color: Colors.grey[100],
-              padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () async {
-                      String url;
-                      if (Platform.isAndroid) {
-                        url = "https://jw2019.org";
-                        if (await canLaunch(url)) {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        }
-                      } else {
-                        url = "https://jw2019.org";
-                        try {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        } catch (e) {
-                          print(e.toString());
-                        }
-                      }
-                    },
-                    child: Text("jw2019.org", style: TextStyle(color: Colors.blue),),
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      String url;
-                      if (Platform.isAndroid) {
-                        url = "https://jw2019seoul.org/park";
-                        if (await canLaunch(url)) {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        }
-                      } else {
-                        url = "https://jw2019seoul.org/park";
-                        try {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        } catch (e) {
-                          print(e.toString());
-                        }
-                      }
-                    },
-                    child: Text("jw2019seoul.org/park", style: TextStyle(color: Colors.blue),),
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      String url;
-                      if (Platform.isAndroid) {
-                        url = "https://blog.naver.com/hyla981020/221612010974";
-                        if (await canLaunch(url)) {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        }
-                      } else {
-                        url = "https://blog.naver.com/hyla981020/221612010974";
-                        try {
-                          await launch(
-                            url,
-                            forceSafariVC: true,
-                            forceWebView: true,
-                            enableJavaScript: true,
-                          );
-                        } catch (e) {
-                          print(e.toString());
-                        }
-                      }
-                    },
-                    child: Text("개인정보처리방침", style: TextStyle(color: Colors.blue),),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.fromLTRB(50, 0, 50, 0),
+              padding: EdgeInsets.fromLTRB(50, 200, 50, 0),
               child: RaisedButton(
                 color: Colors.green[900],
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -750,53 +491,71 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                 Expanded(
                   child: Text("1전시장 터미널", style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.pink),),
                 ),
-                Container(
-                  alignment: Alignment.centerRight,
-                  child: ButtonTheme(
-                    minWidth: 10.0,
-                    height: 1,
-                    child: RaisedButton(
-                      padding: EdgeInsets.zero,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      color: Colors.blue,
-                      onPressed: () async {
-                        String url = "https://ip2019.tk/guide/map1t?token=" + prefs.getString('token');
-                        if (Platform.isAndroid) {
-                          if (await canLaunch(url)) {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          }
-                        } else {
-                          try {
-                            await launch(
-                              url,
-                              forceSafariVC: true,
-                              forceWebView: true,
-                              enableJavaScript: true,
-                            );
-                          } catch (e) {
-                            print(e.toString());
-                          }
-                        }
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(10.0),
-                        child: Text("지도", style: TextStyle(fontSize: 10.0, color: Colors.white,),),
-                      ),
-                    ),
-                  ),
-                ),
+//                Container(
+//                  alignment: Alignment.centerRight,
+//                  child: ButtonTheme(
+//                    minWidth: 10.0,
+//                    height: 1,
+//                    child: RaisedButton(
+//                      padding: EdgeInsets.zero,
+//                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+//                      color: Colors.blue,
+//                      onPressed: () async {
+//                        String url = "https://ip2019.tk/guide/map1t?token=" + prefs.getString('token');
+//                        if (Platform.isAndroid) {
+//                          if (await canLaunch(url)) {
+//                            await launch(
+//                              url,
+//                              forceSafariVC: true,
+//                              forceWebView: true,
+//                              enableJavaScript: true,
+//                            );
+//                          }
+//                        } else {
+//                          try {
+//                            await launch(
+//                              url,
+//                              forceSafariVC: true,
+//                              forceWebView: true,
+//                              enableJavaScript: true,
+//                            );
+//                          } catch (e) {
+//                            print(e.toString());
+//                          }
+//                        }
+//                      },
+//                      child: Container(
+//                        padding: EdgeInsets.all(10.0),
+//                        child: Text("지도", style: TextStyle(fontSize: 10.0, color: Colors.white,),),
+//                      ),
+//                    ),
+//                  ),
+//                ),///
               ],
             ),
           ) : Container(),
+          new SizedBox(
+            height: 10.0,
+            child: new Center(
+              child: new Container(
+                height: 5.0,
+                color: Colors.green[900],
+              ),
+            ),
+          ),
           Container(
             color: Colors.grey[100],
             padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
             child: Text("버스 이용 확인", style: TextStyle(fontWeight: FontWeight.bold,),),
+          ),
+          new SizedBox(
+            height: 10.0,
+            child: new Center(
+              child: new Container(
+                height: 5.0,
+                color: Colors.white,
+              ),
+            ),
           ),
           depart(),
           (confirm1 && !confirm2) ? FadeTransition(
@@ -807,6 +566,13 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
           ),
           arrive(),
           (confirm2 && !confirm3) ? FadeTransition(
+            opacity: _animationController,
+            child: Icon(Icons.arrow_downward, color:  Colors.yellow[900],),
+          ) : Container(
+            child: Icon(Icons.arrow_downward, color: !confirm3 ?  Colors.red[900] : Colors.green[900],),
+          ),
+          terminalArrive(),
+          (confirm3 && !confirm4) ? FadeTransition(
             opacity: _animationController,
             child: Icon(Icons.arrow_downward, color:  Colors.yellow[900],),
           ) : Container(
@@ -845,10 +611,30 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
     return Container(
       padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Container(
-        color: !confirm2 ? Colors.grey[100] : Colors.red[300],
+        color: !confirm2 ? Colors.grey[100] : Colors.orange[200],
         child: ListTile(
           dense: true,
           leading: Icon(Icons.looks_two, color: !confirm2 ? Colors.red : Colors.green,),
+          title: Text("버스 진입 중", style: TextStyle(fontSize: 20),),
+          subtitle: Text("버스기사에게 연락이 완료되어 버스가 터미널에 오는 중입니다.",),
+          onTap: () {
+            setState(() {
+              !confirm2 ? alert("아직 기사에게 연락되지 않았습니다. 새로고침을 눌러 다시 확인해주세요. (확인을 누르면 강제로 진행됩니다)", 2) : alert("연락이 완료되었습니다. 잠시 기다려주세요. (확인을 누르면 강제로 진행됩니다)", 7);
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget terminalArrive() {
+    return Container(
+      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: Container(
+        color: !confirm3 ? Colors.grey[100] : Colors.red[300],
+        child: ListTile(
+          dense: true,
+          leading: Icon(Icons.looks_3, color: !confirm3 ? Colors.red : Colors.green,),
           trailing: Container(
             child: ButtonTheme(
               minWidth: 10.0,
@@ -874,7 +660,7 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
           subtitle: Text("버스가 도착하면 색상이 바뀝니다. 그때 오른쪽 버튼을 눌러 위치를 확인해주세요.",),
           onTap: () {
             setState(() {
-              !confirm2 ? alert("버스가 아직 도착하지 않았습니다. 새로고침을 눌러 다시 확인해주세요. (확인을 누르면 강제로 진행됩니다)", 3) : alert("버스가 도착하였습니다. 위치를 확인해주세요. (확인을 누르면 강제로 진행됩니다)", 8);
+              !confirm3 ? alert("버스가 아직 도착하지 않았습니다. 새로고침을 눌러 다시 확인해주세요. (확인을 누르면 강제로 진행됩니다)", 3) : alert("버스가 도착하였습니다. 위치를 확인해주세요. (확인을 누르면 강제로 진행됩니다)", 8);
             });
           },
         ),
@@ -886,14 +672,14 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
     return Container(
       padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
       child: Container(
-        color: !confirm3 ? Colors.grey[100] : Colors.orange[200],
+        color: !confirm4 ? Colors.grey[100] : Colors.orange[200],
         child: ListTile(
           dense: true,
-          leading: Icon(Icons.looks_3, color: !confirm3 ? Colors.red : Colors.green,),
+          leading: Icon(Icons.looks_4, color: !confirm4 ? Colors.red : Colors.green,),
           title: Text("승차 완료, 출발 (앱종료)", style: TextStyle(fontSize: 20),),
           subtitle: Text("모두 승차하고, 버스가 터미널(주차장)을 떠날 때 누릅니다.",),
           onTap: () {
-            !confirm3 ? alert("버스에 승객이 모두 승차하였고, 터미널을 빠져나왔습니까?", 2) : alert("버스에 승객이 승차하지 않았습니까? 또는 아직 터미널을 빠져나오지 않았습니까?", 7);
+            !confirm4 ? alert("버스에 승객이 모두 승차하였고, 터미널을 빠져나왔습니까?", 4) : alert("버스에 승객이 승차하지 않았습니까? 또는 아직 터미널을 빠져나오지 않았습니까?", 9);
           },
         ),
       ),
@@ -902,7 +688,7 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
 
   Widget finish() {
     return ListTile(
-      title: confirm3 ? Text("수고하셨습니다!", style: TextStyle(fontSize: 14), textAlign: TextAlign.center,) : null,
+      title: confirm4 ? Text("수고하셨습니다!", style: TextStyle(fontSize: 14), textAlign: TextAlign.center,) : null,
     );
   }
 
@@ -958,6 +744,36 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
               child: Text('네'),
               onPressed: () {
                 Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _terminate() {
+    Navigator.pushReplacement(
+      context,
+      new MaterialPageRoute(
+          builder: (BuildContext context) => new TerminateApp()
+      ),
+    );
+  }
+
+  Future<void> terminate() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("성공적으로 처리되었습니다."),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('네'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _terminate();
               },
             ),
           ],
@@ -1055,8 +871,40 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                     });
                     break;
                   case 2:
+                    if (confirm1) {
+                      status(prefs.getString("token"), "call").then((post) {
+                        if (post.ok) {
+                          setState(() {
+                            confirm2 = true;
+                            _isLoading = false;
+                          });
+                          success();
+                        } else {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          network();
+                        }
+                      }).catchError((e) {
+                        print(e.toString());
+                        setState(() {
+                          _isLoading = false;
+                        });
+                        network();
+                      });
+                    } else {
+                      confirm();
+                      setState(() {
+                        _isLoading = false;
+                      });
+                    }
+                    setState(() {
+                      _isLoading = false;
+                    });
+                    break;
+                  case 3:
                     if (confirm2) {
-                      status(prefs.getString("token"), "rEnd").then((post) {
+                      status(prefs.getString("token"), "rTerminal").then((post) {
                         if (post.ok) {
                           setState(() {
                             confirm3 = true;
@@ -1086,15 +934,15 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                       _isLoading = false;
                     });
                     break;
-                  case 3:
-                    if (confirm1) {
-                      status(prefs.getString("token"), "rTerminal").then((post) {
+                  case 4:
+                    if (confirm3) {
+                      status(prefs.getString("token"), "rEnd").then((post) {
                         if (post.ok) {
                           setState(() {
-                            confirm2 = true;
+                            confirm4 = true;
                             _isLoading = false;
                           });
-                          success();
+                          terminate();
                         } else {
                           setState(() {
                             _isLoading = false;
@@ -1141,7 +989,7 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                         network();
                       });
                     } else {
-                      confirm02();
+                      confirm();
                       setState(() {
                         _isLoading = false;
                       });
@@ -1151,31 +999,6 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                     });
                     break;
                   case 7:
-                    status(prefs.getString("token"), "rTerminal").then((post) {
-                      if (post.ok) {
-                        setState(() {
-                          confirm3 = false;
-                          _isLoading = false;
-                        });
-                        success();
-                      } else {
-                        setState(() {
-                          _isLoading = false;
-                        });
-                        network();
-                      }
-                    }).catchError((e) {
-                      print(e.toString());
-                      setState(() {
-                        _isLoading = false;
-                      });
-                      network();
-                    });
-                    setState(() {
-                      _isLoading = false;
-                    });
-                    break;
-                  case 8:
                     if (!confirm3) {
                       status(prefs.getString("token"), "ready").then((post) {
                         if (post.ok) {
@@ -1203,6 +1026,63 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
                         _isLoading = false;
                       });
                     }
+                    setState(() {
+                      _isLoading = false;
+                    });
+                    break;
+                  case 8:
+                    if (!confirm4) {
+                      status(prefs.getString("token"), "call").then((post) {
+                        if (post.ok) {
+                          setState(() {
+                            confirm3 = false;
+                            _isLoading = false;
+                          });
+                          success();
+                        } else {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          network();
+                        }
+                      }).catchError((e) {
+                        print(e.toString());
+                        setState(() {
+                          _isLoading = false;
+                        });
+                        network();
+                      });
+                    } else {
+                      confirm();
+                      setState(() {
+                        _isLoading = false;
+                      });
+                    }
+                    setState(() {
+                      _isLoading = false;
+                    });
+                    break;
+                  case 9:
+                    status(prefs.getString("token"), "rTerminal").then((post) {
+                      if (post.ok) {
+                        setState(() {
+                          confirm4 = false;
+                          _isLoading = false;
+                        });
+                        success();
+                      } else {
+                        setState(() {
+                          _isLoading = false;
+                        });
+                        network();
+                      }
+                    }).catchError((e) {
+                      print(e.toString());
+                      setState(() {
+                        _isLoading = false;
+                      });
+                      network();
+                    });
                     setState(() {
                       _isLoading = false;
                     });
