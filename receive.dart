@@ -548,15 +548,6 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
             padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
             child: Text("버스 이용 확인", style: TextStyle(fontWeight: FontWeight.bold,),),
           ),
-          new SizedBox(
-            height: 10.0,
-            child: new Center(
-              child: new Container(
-                height: 5.0,
-                color: Colors.white,
-              ),
-            ),
-          ),
           depart(),
           (confirm1 && !confirm2) ? FadeTransition(
             opacity: _animationController,
