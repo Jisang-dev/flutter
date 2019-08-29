@@ -30,20 +30,13 @@ Future<Post> updateToken(String _token, String notification) async {
 }
 
 class Step {
-  static const DEPARTURE_INFO_REQUEST = 0;
-  static const DEPARTURE_READY = 10;
-  static const DEPARTURE_START = 11;
-  static const DEPARTURE_CP_1 = 12;
-  static const DEPARTURE_CP_2 = 13;
-  static const DEPARTURE_TERMINAL = 14;
-  static const DEPARTURE_END = 15;
-
   static const RETURN_REQUEST = 20;
   static const RETURN_READY = 21;
   static const RETURN_CALL = 22;
-  static const RETURN_TERMINAL = 23;
-  static const RETURN_RIDE = 24;
-  static const RETURN_END = 24;
+  static const RETURN_APPROACH = 23;
+  static const RETURN_TERMINAL = 24;
+  static const RETURN_RIDE = 25;
+  static const RETURN_END = 26;
 }
 
 Map<String, dynamic> dataInt = new Map();
@@ -74,6 +67,7 @@ class _MyAppState extends State<Receive1App> with TickerProviderStateMixin {
 
   Map<String, dynamic> info;
   Map<String, dynamic> summary;
+  String type;
 
   Widget circle = Center(child: CircularProgressIndicator());
 
@@ -82,6 +76,23 @@ class _MyAppState extends State<Receive1App> with TickerProviderStateMixin {
 
   void currentUser() async {
     prefs = await SharedPreferences.getInstance();
+    await _summary().then((data) {
+      if (data != null && data['ok']) {
+        setState(() {
+          print(data);
+          summary = data;
+          type = (summary == null) ? "" :
+          summary['bus_target_code'][0] == 21 && summary['bus_target_code'][1] == 11 ? "금" :
+          summary['bus_target_code'][0] == 22 && summary['bus_target_code'][1] == 11 ? "금A" :
+          summary['bus_target_code'][0] == 11 && summary['bus_target_code'][1] == 21 ? "토" :
+          summary['bus_target_code'][0] == 11 && summary['bus_target_code'][1] == 22 ? "토A" :
+          summary['bus_target_code'][0] == 12 && summary['bus_target_code'][1] == 12 ? "일" :
+          summary['bus_target_code'][0] == 11 && summary['bus_target_code'][1] == 11 ? "'1' 구역" :
+          summary['bus_target_code'][0] == 21 && summary['bus_target_code'][1] == 21 ? "'2' 구역" :
+          summary['bus_target_code'][0] == 41 && summary['bus_target_code'][1] == 41 ? "해외/국내 대표단" : "중국어 대회";
+        });
+      }
+    });
     await _user().then((data) async {
       if (data != null && data['ok']) {
         setState(() {
@@ -92,14 +103,6 @@ class _MyAppState extends State<Receive1App> with TickerProviderStateMixin {
         } else if (info['bus_step'] >= Step.RETURN_READY) {
           confirm1 = true;
         }
-      }
-    });
-    await _summary().then((data) {
-      if (data != null && data['ok']) {
-        setState(() {
-          print(data);
-          summary = data;
-        });
       }
     });
   }
@@ -234,7 +237,7 @@ class _MyAppState extends State<Receive1App> with TickerProviderStateMixin {
           appBar: new AppBar(
             // Here we take the value from the MyHomePage object that was created by
             // the App.build method, and use it to set our appbar title.
-            title: new Text("2019SIC 주차 지원", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20,),),
+            title: new Text("SIC2019 주차 지원", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20,),),
             actions: <Widget>[
               IconButton(
                 icon: Icon(Icons.refresh),
@@ -263,7 +266,7 @@ class _MyAppState extends State<Receive1App> with TickerProviderStateMixin {
                 Container(
                   height: 90.0,
                   child: DrawerHeader(
-                    child:  Text("2019SIC 주차 지원", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),),
+                    child:  Text("SIC2019 주차 지원", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),),
                     decoration: BoxDecoration(
                       color: Colors.green[900],
                     ),
@@ -285,79 +288,51 @@ class _MyAppState extends State<Receive1App> with TickerProviderStateMixin {
                       + "둘째날(토요일)\n    오전: " + summary['bus_target'][1] + "\n    오후: " + summary['bus_return'][1] + "\n\n"
                       + "셋째날(일요일)\n    오전: " + summary['bus_target'][2] + "\n    오후: " + summary['bus_return'][2]),
                 ),
-//              ListTile(
-//                title: Text('앱 사용법 (준비중)', style: TextStyle(fontWeight: FontWeight.bold),),
-//                leading: Icon(Icons.announcement),
-//              ),
-//              Container(
-//                color: Colors.grey[100],
-//                padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-//                child: Column(
-//                  crossAxisAlignment: CrossAxisAlignment.start,
-//                  children: <Widget>[
-//                    GestureDetector(
-//                      onTap: () async {
-//                        String url;
-//                        if (Platform.isAndroid) {
-//                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-//                          if (await canLaunch(url)) {
-//                            await launch(
-//                              url,
-//                              forceSafariVC: true,
-//                              forceWebView: true,
-//                              enableJavaScript: true,
-//                            );
-//                          }
-//                        } else {
-//                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-//                          try {
-//                            await launch(
-//                              url,
-//                              forceSafariVC: true,
-//                              forceWebView: true,
-//                              enableJavaScript: true,
-//                            );
-//                          } catch (e) {
-//                            print(e.toString());
-//                          }
-//                        }
-//                      },
-//                      child: Text("대회장으로", style: TextStyle(color: Colors.blue),),
-//                    ),
-//                    GestureDetector(
-//                      onTap: () async {
-//                        String url;
-//                        if (Platform.isAndroid) {
-//                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-//                          if (await canLaunch(url)) {
-//                            await launch(
-//                              url,
-//                              forceSafariVC: true,
-//                              forceWebView: true,
-//                              enableJavaScript: true,
-//                            );
-//                          }
-//                        } else {
-//                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-//                          try {
-//                            await launch(
-//                              url,
-//                              forceSafariVC: true,
-//                              forceWebView: true,
-//                              enableJavaScript: true,
-//                            );
-//                          } catch (e) {
-//                            print(e.toString());
-//                          }
-//                        }
-//                      },
-//                      child: Text("집으로", style: TextStyle(color: Colors.blue),),
-//                    ),
-//                  ],
-//                ),
-//              ),
+                ListTile(
+                  title: Text('버스 인솔자용 파일: ' + type, style: TextStyle(fontWeight: FontWeight.bold),),
+                  leading: Icon(Icons.insert_drive_file),
+                ),
                 Container(
-                  padding: EdgeInsets.fromLTRB(50, 200, 50, 0),
+                  color: Colors.grey[100],
+                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+                  child: GestureDetector(
+                    onTap: () async {
+                      String url =
+                      summary['bus_target_code'][0] == 21 && summary['bus_target_code'][1] == 11 ? "https://drive.google.com/open?id=17PGJjwb9qQ-if7FvL_ZsrHpeSO8nOn-L" :
+                      summary['bus_target_code'][0] == 22 && summary['bus_target_code'][1] == 11 ? "https://drive.google.com/open?id=12xa0copHjNNmCa_x1ncBDMujFd4QxLM0" :
+                      summary['bus_target_code'][0] == 11 && summary['bus_target_code'][1] == 21 ? "https://drive.google.com/open?id=1jur9t1AlcRkdlEIN38JFU30-YmeL2XOC" :
+                      summary['bus_target_code'][0] == 11 && summary['bus_target_code'][1] == 22 ? "https://drive.google.com/open?id=1F1-LhjS3QqVWxEjzT89SIVB5O95gG-xo" :
+                      summary['bus_target_code'][0] == 12 && summary['bus_target_code'][1] == 12 ? "https://drive.google.com/open?id=120PXgkzdUpFRsgacsu4zSq_YdPozHmYB" :
+                      summary['bus_target_code'][0] == 11 && summary['bus_target_code'][1] == 11 ? "https://drive.google.com/open?id=1Ikv4bp79ipY35dRa5ufQPVccJDhMGy34" :
+                      summary['bus_target_code'][0] == 21 && summary['bus_target_code'][1] == 21 ? "https://drive.google.com/open?id=1ID7pjflNW_zKS0Nwmo6CGziHkLqLf9ju" :
+                      summary['bus_target_code'][0] == 41 && summary['bus_target_code'][1] == 41 ? "https://drive.google.com/open?id=1P3ysjLbv9M9WC7bCCDGYxyceIlO1nDv9" : "https://drive.google.com/open?id=10K9VmxV5ot-ByOq_VDyI_57sElU-ZH9w";
+                      if (Platform.isAndroid) {
+                        if (await canLaunch(url)) {
+                          await launch(
+                            url,
+                            forceSafariVC: true,
+                            forceWebView: true,
+                            enableJavaScript: true,
+                          );
+                        }
+                      } else {
+                        try {
+                          await launch(
+                            url,
+                            forceSafariVC: true,
+                            forceWebView: true,
+                            enableJavaScript: true,
+                          );
+                        } catch (e) {
+                          print(e.toString());
+                        }
+                      }
+                    },
+                    child: Text("PDF 파일 (클릭 시 사이트로 이동)", style: TextStyle(color: Colors.blue,),),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.fromLTRB(50, 100, 50, 0),
                   child: RaisedButton(
                     color: Colors.green[900],
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -393,7 +368,7 @@ class _MyAppState extends State<Receive1App> with TickerProviderStateMixin {
                 Container(
                   height: 90.0,
                   child: DrawerHeader(
-                    child:  Text("2019SIC 주차 지원", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),),
+                    child:  Text("SIC2019 주차 지원", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),),
                     decoration: BoxDecoration(
                       color: Colors.green[900],
                     ),
@@ -512,46 +487,23 @@ class _MyAppState extends State<Receive1App> with TickerProviderStateMixin {
                 Expanded(
                   child: Text(summary['bus_target'][dataInt[_commitDate]] ?? "오류", style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.pink),),
                 ),
-//                Container(
-//                  alignment: Alignment.centerRight,
-//                  child: ButtonTheme(
-//                    minWidth: 10.0,
-//                    height: 1,
-//                    child: RaisedButton(
-//                      padding: EdgeInsets.zero,
-//                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-//                      color: Colors.blue,
-//                      onPressed: () async {
-//                        String url = "https://ip2019.tk/guide/map1t?token=" + prefs.getString('token');
-//                        if (Platform.isAndroid) {
-//                          if (await canLaunch(url)) {
-//                            await launch(
-//                              url,
-//                              forceSafariVC: true,
-//                              forceWebView: true,
-//                              enableJavaScript: true,
-//                            );
-//                          }
-//                        } else {
-//                          try {
-//                            await launch(
-//                              url,
-//                              forceSafariVC: true,
-//                              forceWebView: true,
-//                              enableJavaScript: true,
-//                            );
-//                          } catch (e) {
-//                            print(e.toString());
-//                          }
-//                        }
-//                      },
-//                      child: Container(
-//                        padding: EdgeInsets.all(10.0),
-//                        child: Text("지도", style: TextStyle(fontSize: 10.0, color: Colors.white,),),
-//                      ),
-//                    ),
-//                  ),
-//                ),///
+                Container(
+                  alignment: Alignment.centerRight,
+                  child: ButtonTheme(
+                    minWidth: 10.0,
+                    height: 1,
+                    child: RaisedButton(
+                      padding: EdgeInsets.zero,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      color: Colors.blue,
+                      onPressed: _map,
+                      child: Container(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text("지도", style: TextStyle(fontSize: 10.0, color: Colors.white,),),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ) : Container(),
@@ -592,7 +544,7 @@ class _MyAppState extends State<Receive1App> with TickerProviderStateMixin {
         color: !confirm1 ? Colors.grey[100] : Colors.red[300],
         child: ListTile(
           dense: true,
-          leading: Icon(Icons.looks_one, color: !confirm1 ? Colors.red : Colors.green,),
+          leading: Icon(Icons.fiber_manual_record, color: Colors.blue,),
           trailing: Container(
             child: ButtonTheme(
               minWidth: 10.0,
@@ -601,12 +553,7 @@ class _MyAppState extends State<Receive1App> with TickerProviderStateMixin {
                 padding: EdgeInsets.zero,
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 color: Colors.blue,
-//                onPressed: () async {
-//                  Navigator.push(
-//                    context,
-//                    MaterialPageRoute(builder: (context) => Maps(title: "1터미널",)), /// 터미널에 따라 지도 모양 다르게
-//                  );
-//                },
+                onPressed: _map,
                 child: Container(
                   padding: EdgeInsets.all(10.0),
                   child: Text("확인", style: TextStyle(fontSize: 10.0, color: Colors.white,),),
@@ -618,7 +565,7 @@ class _MyAppState extends State<Receive1App> with TickerProviderStateMixin {
           subtitle: Text("버스위치가 확인되면 색상이 바뀝니다. 그때 오른쪽 버튼을 눌러 위치를 확인해주세요.",),
           onTap: () {
             setState(() {
-              !confirm1 ? alert("버스 위치가 확인되지 않았습니다. 새로고침을 눌러 다시 확인해주세요. 오류 지속 시 주차부에 문의바랍니다. (확인을 누르면 강제로 진행됩니다)", 1) : alert("버스가 도착하였습니다. 위치를 확인해주세요. (확인을 누르면 강제로 진행됩니다)", 6);
+              !confirm1 ? alert("버스 위치가 확인되지 않았습니다. 새로고침을 눌러 다시 확인해주세요. 오류 지속 시 주차부에 문의바랍니다.", 0) : alert("버스가 도착하였습니다. 위치를 확인해주세요.", 0);
             });
           },
         ),
@@ -633,7 +580,7 @@ class _MyAppState extends State<Receive1App> with TickerProviderStateMixin {
         color: !confirm2 ? Colors.grey[100] : Colors.orange[200],
         child: ListTile(
           dense: true,
-          leading: Icon(Icons.looks_two, color: !confirm2 ? Colors.red : Colors.green,),
+          leading: Icon(Icons.looks_one, color: !confirm2 ? Colors.red : Colors.green,),
           title: Text("승차 완료, 출발 (앱종료)", style: TextStyle(fontSize: 20),),
           subtitle: Text("모두 승차하고, 버스가 주차장을 떠날 때 누릅니다.",),
           onTap: () {
@@ -647,6 +594,13 @@ class _MyAppState extends State<Receive1App> with TickerProviderStateMixin {
   Widget finish() {
     return ListTile(
       title: confirm2 ? Text("수고하셨습니다!", style: TextStyle(fontSize: 14), textAlign: TextAlign.center,) : null,
+    );
+  }
+
+  void _map() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Maps(title: summary["bus_return_code"][dataInt[_commitDate]] ?? 0,)), /// 터미널에 따라 지도 모양 다르게
     );
   }
 
@@ -766,7 +720,7 @@ class _MyAppState extends State<Receive1App> with TickerProviderStateMixin {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("접근이 승인되었습니다"),
+          title: Text("진행상태가 갱신되었습니다."),
           actions: <Widget>[
             FlatButton(
               child: Text('네'),
@@ -995,7 +949,7 @@ class Edit extends State<EditProfile> {
             icon: new Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          title: Text('2019SIC 주차 지원', style: TextStyle(fontWeight: FontWeight.bold,),),
+          title: Text('SIC2019 주차 지원', style: TextStyle(fontWeight: FontWeight.bold,),),
         ),
         body: Container(
           alignment: Alignment.center,
@@ -1280,7 +1234,7 @@ class EditB extends State<EditBus> {
             icon: new Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          title: Text('2019SIC 주차 지원', style: TextStyle(fontWeight: FontWeight.bold,),),
+          title: Text('SIC2019 주차 지원', style: TextStyle(fontWeight: FontWeight.bold,),),
         ),
         body: Container(
           alignment: Alignment.center,

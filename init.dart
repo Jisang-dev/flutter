@@ -1,4 +1,3 @@
-// 이 화면은 초기 버스 정보값(버스기사 번호 등)을 받기 위한 화면으로 사용될 예정입니다.
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
@@ -15,6 +14,12 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:pdsample/change.dart';
 import 'package:package_info/package_info.dart';
 
+Map<String, dynamic> dataInt = {
+  '첫째날(금) 09-13': 0,
+  '둘째날(토) 09-14': 1,
+  '셋째날(일) 09-15': 2,
+};
+
 class Step {
   static const DEPARTURE_INFO_REQUEST = 0;
   static const DEPARTURE_READY = 10;
@@ -27,9 +32,10 @@ class Step {
   static const RETURN_REQUEST = 20;
   static const RETURN_READY = 21;
   static const RETURN_CALL = 22;
-  static const RETURN_TERMINAL = 23;
-  static const RETURN_RIDE = 24;
-  static const RETURN_END = 24;
+  static const RETURN_APPROACH = 23;
+  static const RETURN_TERMINAL = 24;
+  static const RETURN_RIDE = 25;
+  static const RETURN_END = 26;
 }
 
 class Post {
@@ -120,6 +126,7 @@ class _MyAppState extends State<InitPage> {
   Map<String, dynamic> info;
   Map<String, dynamic> summary;
   PackageInfo packageInfo;
+  String type;
 
   Timeline _timeline = (new DateTime.now().hour < 12) ? Timeline.morning : Timeline.afternoon;
   String _commitDate = DateTime.now().day % 3 == 1 ? '첫째날(금) 09-13': (DateTime.now().day % 3 == 2 ? '둘째날(토) 09-14': '셋째날(일) 09-15');
@@ -164,6 +171,15 @@ class _MyAppState extends State<InitPage> {
         setState(() {
           print(data);
           summary = data;
+          type = (summary == null) ? "" :
+          summary['bus_target_code'][0] == 21 && summary['bus_target_code'][1] == 11 ? "금" :
+          summary['bus_target_code'][0] == 22 && summary['bus_target_code'][1] == 11 ? "금A" :
+          summary['bus_target_code'][0] == 11 && summary['bus_target_code'][1] == 21 ? "토" :
+          summary['bus_target_code'][0] == 11 && summary['bus_target_code'][1] == 22 ? "토A" :
+          summary['bus_target_code'][0] == 12 && summary['bus_target_code'][1] == 12 ? "일" :
+          summary['bus_target_code'][0] == 11 && summary['bus_target_code'][1] == 11 ? "'1' 구역" :
+          summary['bus_target_code'][0] == 21 && summary['bus_target_code'][1] == 21 ? "'2' 구역" :
+          summary['bus_target_code'][0] == 41 && summary['bus_target_code'][1] == 41 ? "해외/국내 대표단" : "중국어 대회";
         });
       }
     });
@@ -179,7 +195,7 @@ class _MyAppState extends State<InitPage> {
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('2019SIC 주차 지원', style: TextStyle(fontWeight: FontWeight.bold,),),
+          title: Text('SIC2019 주차 지원', style: TextStyle(fontWeight: FontWeight.bold,),),
         ),
           body: Container(
             alignment: Alignment.center,
@@ -206,7 +222,7 @@ class _MyAppState extends State<InitPage> {
               Container(
                 height: 90.0,
                 child: DrawerHeader(
-                  child:  Text("2019SIC 주차 지원", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),),
+                  child:  Text("SIC2019 주차 지원", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),),
                   decoration: BoxDecoration(
                     color: Colors.green[900],
                   ),
@@ -228,79 +244,51 @@ class _MyAppState extends State<InitPage> {
                     + "둘째날(토요일)\n    오전: " + summary['bus_target'][1] + "\n    오후: " + summary['bus_return'][1] + "\n\n"
                     + "셋째날(일요일)\n    오전: " + summary['bus_target'][2] + "\n    오후: " + summary['bus_return'][2]),
               ),
-//              ListTile(
-//                title: Text('앱 사용법 (준비중)', style: TextStyle(fontWeight: FontWeight.bold),),
-//                leading: Icon(Icons.announcement),
-//              ),
-//              Container(
-//                color: Colors.grey[100],
-//                padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-//                child: Column(
-//                  crossAxisAlignment: CrossAxisAlignment.start,
-//                  children: <Widget>[
-//                    GestureDetector(
-//                      onTap: () async {
-//                        String url;
-//                        if (Platform.isAndroid) {
-//                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-//                          if (await canLaunch(url)) {
-//                            await launch(
-//                              url,
-//                              forceSafariVC: true,
-//                              forceWebView: true,
-//                              enableJavaScript: true,
-//                            );
-//                          }
-//                        } else {
-//                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-//                          try {
-//                            await launch(
-//                              url,
-//                              forceSafariVC: true,
-//                              forceWebView: true,
-//                              enableJavaScript: true,
-//                            );
-//                          } catch (e) {
-//                            print(e.toString());
-//                          }
-//                        }
-//                      },
-//                      child: Text("대회장으로", style: TextStyle(color: Colors.blue),),
-//                    ),
-//                    GestureDetector(
-//                      onTap: () async {
-//                        String url;
-//                        if (Platform.isAndroid) {
-//                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-//                          if (await canLaunch(url)) {
-//                            await launch(
-//                              url,
-//                              forceSafariVC: true,
-//                              forceWebView: true,
-//                              enableJavaScript: true,
-//                            );
-//                          }
-//                        } else {
-//                          url = "https://jisang-dev.github.io/hyla981020/terminal.html";
-//                          try {
-//                            await launch(
-//                              url,
-//                              forceSafariVC: true,
-//                              forceWebView: true,
-//                              enableJavaScript: true,
-//                            );
-//                          } catch (e) {
-//                            print(e.toString());
-//                          }
-//                        }
-//                      },
-//                      child: Text("집으로", style: TextStyle(color: Colors.blue),),
-//                    ),
-//                  ],
-//                ),
-//              ),
+              ListTile(
+                title: Text('버스 인솔자용 파일: ' + type, style: TextStyle(fontWeight: FontWeight.bold),),
+                leading: Icon(Icons.insert_drive_file),
+              ),
               Container(
-                padding: EdgeInsets.fromLTRB(50, 200, 50, 0),
+                color: Colors.grey[100],
+                padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+                child: GestureDetector(
+                  onTap: () async {
+                    String url =
+                    summary['bus_target_code'][0] == 21 && summary['bus_target_code'][1] == 11 ? "https://drive.google.com/open?id=17PGJjwb9qQ-if7FvL_ZsrHpeSO8nOn-L" :
+                    summary['bus_target_code'][0] == 22 && summary['bus_target_code'][1] == 11 ? "https://drive.google.com/open?id=12xa0copHjNNmCa_x1ncBDMujFd4QxLM0" :
+                    summary['bus_target_code'][0] == 11 && summary['bus_target_code'][1] == 21 ? "https://drive.google.com/open?id=1jur9t1AlcRkdlEIN38JFU30-YmeL2XOC" :
+                    summary['bus_target_code'][0] == 11 && summary['bus_target_code'][1] == 22 ? "https://drive.google.com/open?id=1F1-LhjS3QqVWxEjzT89SIVB5O95gG-xo" :
+                    summary['bus_target_code'][0] == 12 && summary['bus_target_code'][1] == 12 ? "https://drive.google.com/open?id=120PXgkzdUpFRsgacsu4zSq_YdPozHmYB" :
+                    summary['bus_target_code'][0] == 11 && summary['bus_target_code'][1] == 11 ? "https://drive.google.com/open?id=1Ikv4bp79ipY35dRa5ufQPVccJDhMGy34" :
+                    summary['bus_target_code'][0] == 21 && summary['bus_target_code'][1] == 21 ? "https://drive.google.com/open?id=1ID7pjflNW_zKS0Nwmo6CGziHkLqLf9ju" :
+                    summary['bus_target_code'][0] == 41 && summary['bus_target_code'][1] == 41 ? "https://drive.google.com/open?id=1P3ysjLbv9M9WC7bCCDGYxyceIlO1nDv9" : "https://drive.google.com/open?id=10K9VmxV5ot-ByOq_VDyI_57sElU-ZH9w";
+                    if (Platform.isAndroid) {
+                      if (await canLaunch(url)) {
+                        await launch(
+                          url,
+                          forceSafariVC: true,
+                          forceWebView: true,
+                          enableJavaScript: true,
+                        );
+                      }
+                    } else {
+                      try {
+                        await launch(
+                          url,
+                          forceSafariVC: true,
+                          forceWebView: true,
+                          enableJavaScript: true,
+                        );
+                      } catch (e) {
+                        print(e.toString());
+                      }
+                    }
+                  },
+                  child: Text("PDF 파일 (클릭 시 사이트로 이동)", style: TextStyle(color: Colors.blue,),),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.fromLTRB(50, 100, 50, 0),
                 child: RaisedButton(
                   color: Colors.green[900],
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -336,7 +324,7 @@ class _MyAppState extends State<InitPage> {
               Container(
                 height: 90.0,
                 child: DrawerHeader(
-                  child:  Text("2019SIC 주차 지원", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),),
+                  child:  Text("SIC2019 주차 지원", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),),
                   decoration: BoxDecoration(
                     color: Colors.green[900],
                   ),
@@ -585,7 +573,7 @@ class _MyAppState extends State<InitPage> {
         "bus_number": _busCode,
         "bus_driver_phone": _busNumber,
         "status": _status,
-        "bus_day": 0, /// 매일 바뀌어야 함
+        "bus_day": dataInt[_commitDate],
       }),
       headers: {
         "content-type" : "application/json",
@@ -606,19 +594,37 @@ class _MyAppState extends State<InitPage> {
       await fetchPost(prefs.getString('token'), _guideName, _guideNumber, _busCode, _busNumber, _timeline == Timeline.morning ? (info['bus_step'] > Step.DEPARTURE_START && info['bus_step'] <= Step.DEPARTURE_END ? "default" : "dReady") : (info['bus_step'] > Step.RETURN_REQUEST && info['bus_step'] <= Step.RETURN_END ? "default" : "request")).then((post) async {
         if (post.ok) {
           if (_timeline == Timeline.morning) {
-            Navigator.pushReplacement(
-              context,
-              new MaterialPageRoute(
-                  builder: (BuildContext context) => new SendApp(_commitDate)
-              ),
-            );
+            if (type == null || type == "" || type == "해외/국내 대표단" || type == "중국어 대회") {
+              Navigator.pushReplacement(
+                context,
+                new MaterialPageRoute(
+                    builder: (BuildContext context) => new Send1App(_commitDate)
+                ),
+              );
+            } else {
+              Navigator.pushReplacement(
+                context,
+                new MaterialPageRoute(
+                    builder: (BuildContext context) => new SendApp(_commitDate)
+                ),
+              );
+            }
           } else {
-            Navigator.pushReplacement(
-              context,
-              new MaterialPageRoute(
-                  builder: (BuildContext context) => new ReceiveApp(_commitDate)
-              ),
-            );
+            if (type == null || type == "" || type == "해외/국내 대표단" || type == "중국어 대회") {
+              Navigator.pushReplacement(
+                context,
+                new MaterialPageRoute(
+                    builder: (BuildContext context) => new Receive1App(_commitDate)
+                ),
+              );
+            } else {
+              Navigator.pushReplacement(
+                context,
+                new MaterialPageRoute(
+                    builder: (BuildContext context) => new ReceiveApp(_commitDate)
+                ),
+              );
+            }
           }
         } else {
           await alert(post.reason != null ? post.reason : "관리자 문의");

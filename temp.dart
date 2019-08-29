@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:pdsample/init.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+import 'package:photo_view/photo_view.dart';
 
   Future<Post> fetchPost(String token, String pw) async {
   final response = await http.post (
@@ -257,7 +258,7 @@ class _MyHomePageState extends State<TempPage> {
 class Maps extends StatefulWidget {
   Maps({Key key, this.title}) : super(key: key);
 
-  final String title;
+  final int title;
 
   @override
   _MapState createState() => new _MapState(title: this.title);
@@ -267,9 +268,58 @@ class _MapState extends State<Maps> {
 
   _MapState({this.title});
 
-  final String title;
+  final int title;
 
-//  PhotoViewController controller;
+  Map<int, dynamic> mapCode = {
+    11: "https://ip2019.tk/static/images/park/innerT1.jpg",
+    12: "https://ip2019.tk/static/images/park/innerT1.jpg",
+    21: "https://ip2019.tk/static/images/park/innerT2.jpg",
+    22: "https://ip2019.tk/static/images/park/innerT2-a.jpg",
+    31: "https://ip2019.tk/static/images/park/outer1.jpg",
+    41: "https://ip2019.tk/static/images/park/inner1.jpg",
+
+    301: "https://ip2019.tk/static/images/park/innerT1-1.jpg",
+    302: "https://ip2019.tk/static/images/park/innerT1-2.jpg",
+    303: "https://ip2019.tk/static/images/park/innerT1-3.jpg",
+    304: "https://ip2019.tk/static/images/park/innerT1-4.jpg",
+    305: "https://ip2019.tk/static/images/park/innerT1-5.jpg",
+
+    321: "https://ip2019.tk/static/images/park/innerT2.jpg",
+
+    341: "https://ip2019.tk/static/images/park/innerT2-a.jpg",
+
+    361: "https://ip2019.tk/static/images/park/inner1-a.jpg",
+    362: "https://ip2019.tk/static/images/park/inner1-b.jpg",
+    363: "https://ip2019.tk/static/images/park/inner1-c.jpg",
+    364: "https://ip2019.tk/static/images/park/inner1-d.jpg",
+    365: "https://ip2019.tk/static/images/park/inner1-e.jpg",
+    366: "https://ip2019.tk/static/images/park/inner1-f.jpg",
+    367: "https://ip2019.tk/static/images/park/inner1-g.jpg",
+    368: "https://ip2019.tk/static/images/park/inner1-h.jpg",
+    369: "https://ip2019.tk/static/images/park/inner1-i.jpg",
+    370: "https://ip2019.tk/static/images/park/inner1-j.jpg",
+
+    401: "https://ip2019.tk/static/images/park/inner1-1a.jpg",
+    402: "https://ip2019.tk/static/images/park/inner1-1b.jpg",
+    403: "https://ip2019.tk/static/images/park/inner1-1c.jpg",
+    404: "https://ip2019.tk/static/images/park/inner1-2a.jpg",
+    405: "https://ip2019.tk/static/images/park/inner1-2b.jpg",
+    406: "https://ip2019.tk/static/images/park/inner1-3a.jpg",
+    407: "https://ip2019.tk/static/images/park/inner1-3b.jpg",
+    408: "https://ip2019.tk/static/images/park/inner1-4a.jpg",
+    409: "https://ip2019.tk/static/images/park/inner1-4b.jpg",
+    410: "https://ip2019.tk/static/images/park/inner1-4c.jpg",
+    411: "https://ip2019.tk/static/images/park/inner1-5a.jpg",
+    412: "https://ip2019.tk/static/images/park/inner1-5a.jpg",
+    413: "https://ip2019.tk/static/images/park/inner1-5b.jpg",
+    414: "https://ip2019.tk/static/images/park/inner1-5b.jpg",
+    414: "https://ip2019.tk/static/images/park/inner1-5c.jpg",
+
+    901: "https://ip2019.tk/static/images/park/innerT1.jpg",
+    902: "https://ip2019.tk/static/images/park/innerT2.jpg",
+  };
+
+  PhotoViewController controller;
   double preScale;
   double preX = 0;
   double preY = 0;
@@ -284,28 +334,28 @@ class _MapState extends State<Maps> {
   @override
   void initState() {
     super.initState();
-//    controller = PhotoViewController()
-//      ..outputStateStream.listen(listener);
+    controller = PhotoViewController()
+      ..outputStateStream.listen(listener);
   }
 
   @override
   void dispose() {
-//    controller.dispose();
+    controller.dispose();
     super.dispose();
   }
 
-//  void listener(PhotoViewControllerValue value){
-//    if (preScale == null) {
-//      preScale = value.scale;
-//    }
-//    setState(() {
-//      x += value.position.dx - preX - (value.scale - preScale) * temp.dx * 7;
-//      y -= value.position.dy - preY + (value.scale - preScale) * temp.dy * 7;
-//    });
-//    preScale = value.scale;
-//    preX = value.position.dx;
-//    preY = value.position.dy;
-//  }
+  void listener(PhotoViewControllerValue value){
+    if (preScale == null) {
+      preScale = value.scale;
+    }
+    setState(() {
+      x += value.position.dx - preX - (value.scale - preScale) * temp.dx * 7;
+      y -= value.position.dy - preY + (value.scale - preScale) * temp.dy * 7;
+    });
+    preScale = value.scale;
+    preX = value.position.dx;
+    preY = value.position.dy;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -321,37 +371,37 @@ class _MapState extends State<Maps> {
             icon: new Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          title: Text('상세 지도 확인 (준비중)', style: TextStyle(fontWeight: FontWeight.bold,),),
+          title: Text('상세 지도 확인', style: TextStyle(fontWeight: FontWeight.bold,),),
         ),
         body: Container(
           alignment: Alignment.center,
           child: Stack(
             children: <Widget>[
               Positioned(
-//                child: PhotoView(
-//                  controller: controller,
-//                  imageProvider: AssetImage("assets/return1_b.jpg"),
-//                  minScale: 0.1,
-//                  maxScale: 4.0,
-//                  backgroundDecoration: BoxDecoration(
-//                    color: Colors.white,
-//                  ),
-//                ),
-              ),
-              Positioned(
-                left: x,
-                bottom: y,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Text("1전시관 20", textAlign: TextAlign.center,),
-                    Image.asset(
-                      'assets/place.png',
-                    ),
-                  ],
+                child: PhotoView(
+                  controller: controller,
+                  imageProvider: NetworkImage(mapCode[title]),
+                  minScale: 0.1,
+                  maxScale: 4.0,
+                  backgroundDecoration: BoxDecoration(
+                    color: Colors.white,
+                  ),
                 ),
               ),
+//              Positioned(
+//                left: x,
+//                bottom: y,
+//                child: Column(
+//                  mainAxisAlignment: MainAxisAlignment.center,
+//                  crossAxisAlignment: CrossAxisAlignment.center,
+//                  children: <Widget>[
+//                    Text("1전시관 20", textAlign: TextAlign.center,),
+//                    Image.asset(
+//                      'assets/place.png',
+//                    ),
+//                  ],
+//                ),
+//              ),
             ],
           ),
         ),
@@ -366,14 +416,6 @@ class TerminateApp extends StatelessWidget {
     return new MaterialApp(
       title: '2019 국제대회 주차부',
       theme: new ThemeData(
-// This is the theme of your application.
-//
-// Try running your application with "flutter run". You'll see the
-// application has a blue toolbar. Then, without quitting the app, try
-// changing the primarySwatch below to Colors.green and then invoke
-// "hot reload" (press "r" in the console where you ran "flutter run",
-// or press Run > Flutter Hot Reload in IntelliJ). Notice that the
-// counter didn't reset back to zero; the application is not restarted.
         primaryColor: Colors.green[900],
       ),
       home: new TerminatePage(title: '주차부 버스 인솔자용',),
