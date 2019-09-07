@@ -20,6 +20,11 @@ Map<String, dynamic> dataInt = {
   '셋째날(일) 09-15': 2,
 };
 
+Map<Timeline, dynamic> dataDayInt = {
+  Timeline.morning: 0,
+  Timeline.afternoon: 1,
+};
+
 class Step {
   static const DEPARTURE_INFO_REQUEST = 0;
   static const DEPARTURE_READY = 10;
@@ -70,7 +75,7 @@ class Init {
 
 Future<Map<String, dynamic>> version() async {
   final response = await http.get (
-    "https://ip2019.tk/guide/version",
+    "https://sic2019.kr/guide/version",
     headers: {
       "content-type" : "application/json",
       "accept" : "application/json",
@@ -196,6 +201,14 @@ class _MyAppState extends State<InitPage> {
       home: Scaffold(
         appBar: AppBar(
           title: Text('SIC2019 주차 지원', style: TextStyle(fontWeight: FontWeight.bold,),),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: () {
+                currentUser();
+              },
+            ),
+          ],
         ),
           body: Container(
             alignment: Alignment.center,
@@ -501,7 +514,38 @@ class _MyAppState extends State<InitPage> {
               ),
             ) : Container(),
             _submit(),
-            Text("\n\n주차 안내부 : 010-5613-1935", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
+            Text(""),
+            Text(""),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text("주차 안내부 :", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
+                FlatButton(
+                  onPressed: () async {
+                    String url = "tel:01056131935";
+                    if (Platform.isAndroid) {
+                      if (await canLaunch(url)) {
+                        await launch(
+                          url,
+                          enableJavaScript: true,
+                        );
+                      }
+                    } else {
+                      try {
+                        await launch(
+                          url,
+                          enableJavaScript: true,
+                        );
+                      } catch (e) {
+                        print(e.toString());
+                      }
+                    }
+                  },
+                  child: Text("010-5613-1935", textAlign: TextAlign.left, style: TextStyle(color: Colors.blue),),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -579,7 +623,7 @@ class _MyAppState extends State<InitPage> {
   Future<Map<String, dynamic>> _user() async {
     prefs = await SharedPreferences.getInstance();
     final response = await http.get (
-      "https://ip2019.tk/guide/api?token=" + prefs.getString("token"),
+      "https://sic2019.kr/guide/api?token=" + prefs.getString("token"),
       headers: {
         "content-type" : "application/json",
         "accept" : "application/json",
@@ -591,7 +635,7 @@ class _MyAppState extends State<InitPage> {
   Future<Map<String, dynamic>> _summary() async {
     prefs = await SharedPreferences.getInstance();
     final response = await http.get (
-      "https://ip2019.tk/guide/api/summary?token=" + prefs.getString("token"),
+      "https://sic2019.kr/guide/api/summary?token=" + prefs.getString("token"),
       headers: {
         "content-type" : "application/json",
         "accept" : "application/json",
@@ -602,7 +646,7 @@ class _MyAppState extends State<InitPage> {
 
   Future<Init> fetchPost(String _token, String _guideName, String _guideNumber, String _busCode, String _busNumber, String _status) async {
     final response = await http.post (
-      "https://ip2019.tk/guide/api/info",
+      "https://sic2019.kr/guide/api/info",
       body: json.encode({
         "token" : _token,
         "bus_guide_name": _guideName,
@@ -628,41 +672,45 @@ class _MyAppState extends State<InitPage> {
     if (form.validate()) {
       form.save();
 
-      await fetchPost(prefs.getString('token'), _guideName, _guideNumber, _busCode, _busNumber, _timeline == Timeline.morning ? (info['bus_step'] > Step.DEPARTURE_START && info['bus_step'] <= Step.DEPARTURE_END ? "default" : "dReady") : (info['bus_step'] > Step.RETURN_REQUEST && info['bus_step'] <= Step.RETURN_END ? "default" : "request")).then((post) async {
+      await fetchPost(prefs.getString('token'), _guideName, _guideNumber, _busCode, _busNumber, _timeline == Timeline.morning ? (info['bus_step'] > Step.DEPARTURE_READY && info['bus_step'] <= Step.DEPARTURE_END ? "default" : "dReady") : (info['bus_step'] > Step.RETURN_REQUEST && info['bus_step'] <= Step.RETURN_END ? "default" : "request")).then((post) async {
         if (post.ok) {
-          if (_timeline == Timeline.morning) {
-            if (type == null || type == "" || type == "해외/국내 대표단" || type == "중국어 대회" || (type == "일" && dataInt[_commitDate] == 2)) {
-              Navigator.pushReplacement(
-                context,
-                new MaterialPageRoute(
-                    builder: (BuildContext context) => new Send1App(_commitDate)
-                ),
-              );
+          if (dataInt[_commitDate] == summary['day'] && dataDayInt[_timeline] == summary['phase']) {
+            if (_timeline == Timeline.morning) {
+              if (type == null || type == "" || type == "해외/국내 대표단" || type == "중국어 대회" || (type == "일" && dataInt[_commitDate] == 2)) {
+                Navigator.pushReplacement(
+                  context,
+                  new MaterialPageRoute(
+                      builder: (BuildContext context) => new Send1App(_commitDate)
+                  ),
+                );
+              } else {
+                Navigator.pushReplacement(
+                  context,
+                  new MaterialPageRoute(
+                      builder: (BuildContext context) => new SendApp(_commitDate)
+                  ),
+                );
+              }
             } else {
-              Navigator.pushReplacement(
-                context,
-                new MaterialPageRoute(
-                    builder: (BuildContext context) => new SendApp(_commitDate)
-                ),
-              );
+              if (type == null || type == "" || type == "해외/국내 대표단" || type == "중국어 대회"
+                  || type == "일") { /// 버스 정보 입력 꼭 필요함!!! 입력 안 되었을 시 다음 단계로 진행을 못하게 할 필요 있을 듯
+                Navigator.pushReplacement(
+                  context,
+                  new MaterialPageRoute(
+                      builder: (BuildContext context) => new Receive1App(_commitDate)
+                  ),
+                );
+              } else {
+                Navigator.pushReplacement(
+                  context,
+                  new MaterialPageRoute(
+                      builder: (BuildContext context) => new ReceiveApp(_commitDate)
+                  ),
+                );
+              }
             }
           } else {
-            if (type == null || type == "" || type == "해외/국내 대표단" || type == "중국어 대회"
-            || type == "일") { /// 버스 정보 입력 꼭 필요함!!! 입력 안 되었을 시 다음 단계로 진행을 못하게 할 필요 있을 듯
-              Navigator.pushReplacement(
-                context,
-                new MaterialPageRoute(
-                    builder: (BuildContext context) => new Receive1App(_commitDate)
-                ),
-              );
-            } else {
-              Navigator.pushReplacement(
-                context,
-                new MaterialPageRoute(
-                    builder: (BuildContext context) => new ReceiveApp(_commitDate)
-                ),
-              );
-            }
+            alert("서버에 입력된 시간과 다릅니다. 다시 확인해주세요.");
           }
         } else {
           await alert(post.reason != null ? post.reason : "관리자 문의");

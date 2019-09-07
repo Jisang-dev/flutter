@@ -7,10 +7,11 @@ import 'package:pdsample/init.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'package:photo_view/photo_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 
   Future<Post> fetchPost(String token, String pw) async {
   final response = await http.post (
-  "https://ip2019.tk/auth/api/password_change",
+  "https://sic2019.kr/auth/api/password_change",
     body: json.encode({
       "token": token,
       "password": pw,
@@ -128,7 +129,38 @@ class _MyHomePageState extends State<TempPage> {
             _showEmailInput(),
             _showPasswordInput(),
             _submit(),
-            Text("\n\n주차 안내부 : 010-5613-1935", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
+            Text(""),
+            Text(""),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text("주차 안내부 :", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
+                FlatButton(
+                  onPressed: () async {
+                    String url = "tel:01056131935";
+                    if (Platform.isAndroid) {
+                      if (await canLaunch(url)) {
+                        await launch(
+                          url,
+                          enableJavaScript: true,
+                        );
+                      }
+                    } else {
+                      try {
+                        await launch(
+                          url,
+                          enableJavaScript: true,
+                        );
+                      } catch (e) {
+                        print(e.toString());
+                      }
+                    }
+                  },
+                  child: Text("010-5613-1935", textAlign: TextAlign.left, style: TextStyle(color: Colors.blue),),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -273,39 +305,39 @@ class _MapState extends State<Maps> {
   final String terminal;
 
   Map<int, dynamic> mapCode = {
-    11: "https://ip2019.tk/static/images/park/innerT1.jpg",
-    12: "https://ip2019.tk/static/images/park/innerT1.jpg",
-    21: "https://ip2019.tk/static/images/park/innerT2.jpg",
-    22: "https://ip2019.tk/static/images/park/innerT2-a.jpg",
-    31: "https://ip2019.tk/static/images/park/outer1.jpg",
-    41: "https://ip2019.tk/static/images/park/inner1.jpg",
+    11: "https://sic2019.kr/static/images/park/innerT1.jpg",
+    12: "https://sic2019.kr/static/images/park/innerT1.jpg",
+    21: "https://sic2019.kr/static/images/park/innerT2.jpg",
+    22: "https://sic2019.kr/static/images/park/innerT2-a.jpg",
+    31: "https://sic2019.kr/static/images/park/outer1.jpg",
+    41: "https://sic2019.kr/static/images/park/inner1.jpg",
 
-    301: "https://ip2019.tk/static/images/park/innerT1-1.jpg",
-    302: "https://ip2019.tk/static/images/park/innerT1-2.jpg",
-    303: "https://ip2019.tk/static/images/park/innerT1-3.jpg",
-    304: "https://ip2019.tk/static/images/park/innerT1-4.jpg",
-    305: "https://ip2019.tk/static/images/park/innerT1-5.jpg",
-    306: "https://ip2019.tk/static/images/park/innerT1-6.jpg",
+    301: "https://sic2019.kr/static/images/park/innerT1-1.jpg",
+    302: "https://sic2019.kr/static/images/park/innerT1-2.jpg",
+    303: "https://sic2019.kr/static/images/park/innerT1-3.jpg",
+    304: "https://sic2019.kr/static/images/park/innerT1-4.jpg",
+    305: "https://sic2019.kr/static/images/park/innerT1-5.jpg",
+    306: "https://sic2019.kr/static/images/park/innerT1-6.jpg",
 
-    321: "https://ip2019.tk/static/images/park/innerT2.jpg",
+    321: "https://sic2019.kr/static/images/park/innerT2.jpg",
 
-    341: "https://ip2019.tk/static/images/park/innerT2-a.jpg",
+    341: "https://sic2019.kr/static/images/park/innerT2-a.jpg",
 
-    361: "https://ip2019.tk/static/images/park/outer1-a.jpg",
-    362: "https://ip2019.tk/static/images/park/outer1-b.jpg",
-    363: "https://ip2019.tk/static/images/park/outer1-c.jpg",
-    364: "https://ip2019.tk/static/images/park/outer1-d.jpg",
-    365: "https://ip2019.tk/static/images/park/outer1-e.jpg",
+    361: "https://sic2019.kr/static/images/park/outer1-a.jpg",
+    362: "https://sic2019.kr/static/images/park/outer1-b.jpg",
+    363: "https://sic2019.kr/static/images/park/outer1-c.jpg",
+    364: "https://sic2019.kr/static/images/park/outer1-d.jpg",
+    365: "https://sic2019.kr/static/images/park/outer1-e.jpg",
 
-    401: "https://ip2019.tk/static/images/park/inner1-1.jpg",
-    402: "https://ip2019.tk/static/images/park/inner1-2.jpg",
-    403: "https://ip2019.tk/static/images/park/inner1-3.jpg",
-    404: "https://ip2019.tk/static/images/park/inner1-4.jpg",
-    405: "https://ip2019.tk/static/images/park/inner1-5.jpg",
+    401: "https://sic2019.kr/static/images/park/inner1-1.jpg",
+    402: "https://sic2019.kr/static/images/park/inner1-2.jpg",
+    403: "https://sic2019.kr/static/images/park/inner1-3.jpg",
+    404: "https://sic2019.kr/static/images/park/inner1-4.jpg",
+    405: "https://sic2019.kr/static/images/park/inner1-5.jpg",
 
-    901: "https://ip2019.tk/static/images/park/innerT1.jpg",
-    902: "https://ip2019.tk/static/images/park/innerT2.jpg",
-    903: "https://ip2019.tk/static/images/park/innerT2-a.jpg",
+    901: "https://sic2019.kr/static/images/park/innerT1.jpg",
+    902: "https://sic2019.kr/static/images/park/innerT2.jpg",
+    903: "https://sic2019.kr/static/images/park/innerT2-a.jpg",
   };
 
   Map<int, String> mapCode2 = {
@@ -377,15 +409,26 @@ class _MapState extends State<Maps> {
             icon: new Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          title: Text('주차위치: ' + terminal, style: TextStyle(fontWeight: FontWeight.bold,),),
+          title: Text('상세 주차 지도', style: TextStyle(fontWeight: FontWeight.bold,),),
         ),
-        body: PhotoView(
-          imageProvider: NetworkImage(mapCode[title]),
-          controller: controller,
-          minScale: PhotoViewComputedScale.contained * 0.8,
-          maxScale: PhotoViewComputedScale.covered * 1.8,
-          initialScale: PhotoViewComputedScale.contained,
-          basePosition: Alignment.center,
+        body: Column(
+          children: <Widget>[
+            Text(''),
+            Text('주차위치: ' + terminal, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green[900], fontSize: 22), textAlign: TextAlign.center,),
+            Text(''),
+            Expanded(
+              child: Container(
+                child: PhotoView(
+                  imageProvider: NetworkImage(mapCode[title]),
+                  controller: controller,
+                  minScale: PhotoViewComputedScale.contained * 0.8,
+                  maxScale: PhotoViewComputedScale.covered * 3,
+                  initialScale: PhotoViewComputedScale.contained,
+                  basePosition: Alignment.center,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -466,7 +509,36 @@ class _TerminateState extends State<TerminatePage> {
               style: TextStyle(color: Colors.green[900], fontWeight: FontWeight.bold),
             ),
             _submit(),
-            Text("\n\n주차 안내부 : 010-5613-1935", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text("주차 안내부 :", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
+                FlatButton(
+                  onPressed: () async {
+                    String url = "tel:01056131935";
+                    if (Platform.isAndroid) {
+                      if (await canLaunch(url)) {
+                        await launch(
+                          url,
+                          enableJavaScript: true,
+                        );
+                      }
+                    } else {
+                      try {
+                        await launch(
+                          url,
+                          enableJavaScript: true,
+                        );
+                      } catch (e) {
+                        print(e.toString());
+                      }
+                    }
+                  },
+                  child: Text("010-5613-1935", textAlign: TextAlign.left, style: TextStyle(color: Colors.blue),),
+                ),
+              ],
+            ),
           ],
         ),
       ),

@@ -43,7 +43,7 @@ void main() async {
 
 Future<Post> fetchPost(String id, String pw) async {
   final response = await http.post (
-      "https://ip2019.tk/auth/api",
+      "https://sic2019.kr/auth/api",
       body: json.encode({
         "name": id,
         "password": pw,
@@ -58,7 +58,7 @@ Future<Post> fetchPost(String id, String pw) async {
 
 Future<Map<String, dynamic>> version() async {
   final response = await http.get (
-    "https://ip2019.tk/guide/version",
+    "https://sic2019.kr/guide/version",
     headers: {
       "content-type" : "application/json",
       "accept" : "application/json",
@@ -223,9 +223,38 @@ class _MyHomePageState extends State<MyHomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[Text("주차 안내부", style: TextStyle(fontWeight: FontWeight.bold),),Text("로 문의해 주십시오."),],
+              children: <Widget>[Text("주차 안내부\n\n", style: TextStyle(fontWeight: FontWeight.bold),),Text("로 문의해 주십시오.\n\n"),],
             ),
-            Text("\n\n주차 안내부 : 010-5613-1935", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text("주차 안내부 :", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
+                  FlatButton(
+                    onPressed: () async {
+                      String url = "tel:01056131935";
+                      if (Platform.isAndroid) {
+                        if (await canLaunch(url)) {
+                          await launch(
+                            url,
+                            enableJavaScript: true,
+                          );
+                        }
+                      } else {
+                        try {
+                          await launch(
+                            url,
+                            enableJavaScript: true,
+                          );
+                        } catch (e) {
+                          print(e.toString());
+                        }
+                      }
+                    },
+                    child: Text("010-5613-1935", textAlign: TextAlign.left, style: TextStyle(color: Colors.blue),),
+                  ),
+                ],
+            ),
           ],
         ),
       ),

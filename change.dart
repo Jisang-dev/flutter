@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Future<Post> fetchPost(String token, String pw) async {
   final response = await http.post (
-    "https://ip2019.tk/auth/api/password_change",
+    "https://sic2019.kr/auth/api/password_change",
     body: json.encode({
       "token": token,
       "password": pw,

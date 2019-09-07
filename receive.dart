@@ -16,7 +16,7 @@ String commit;
 
 Future<Post> updateToken(String _token, String notification) async {
   final response = await http.post (
-    "https://ip2019.tk/guide/api/notification",
+    "https://sic2019.kr/guide/api/notification",
     body: json.encode({
       "token" : _token,
       "notification": notification,
@@ -220,7 +220,7 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
 
   Future<Init> status(String _token, String _status) async {
     final response = await http.post (
-      "https://ip2019.tk/guide/api/status",
+      "https://sic2019.kr/guide/api/status",
       body: json.encode({
         "token" : _token,
         "status": _status,
@@ -255,7 +255,7 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
   Future<Map<String, dynamic>> _user() async {
     prefs = await SharedPreferences.getInstance();
     final response = await http.get (
-      "https://ip2019.tk/guide/api?token=" + prefs.getString("token"),
+      "https://sic2019.kr/guide/api?token=" + prefs.getString("token"),
       headers: {
         "content-type" : "application/json",
         "accept" : "application/json",
@@ -267,7 +267,7 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
   Future<Map<String, dynamic>> _summary() async {
     prefs = await SharedPreferences.getInstance();
     final response = await http.get (
-      "https://ip2019.tk/guide/api/summary?token=" + prefs.getString("token"),
+      "https://sic2019.kr/guide/api/summary?token=" + prefs.getString("token"),
       headers: {
         "content-type" : "application/json",
         "accept" : "application/json",
@@ -646,7 +646,38 @@ class _MyAppState extends State<ReceiveApp> with TickerProviderStateMixin {
           ),
           terminalDepart(),
           finish(),
-          Text("\n\n주차 안내부 : 010-5613-1935\n\n", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
+          Text(""),
+          Text(""),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text("주차 안내부 :", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey),),
+              FlatButton(
+                onPressed: () async {
+                  String url = "tel:01056131935";
+                  if (Platform.isAndroid) {
+                    if (await canLaunch(url)) {
+                      await launch(
+                        url,
+                        enableJavaScript: true,
+                      );
+                    }
+                  } else {
+                    try {
+                      await launch(
+                        url,
+                        enableJavaScript: true,
+                      );
+                    } catch (e) {
+                      print(e.toString());
+                    }
+                  }
+                },
+                child: Text("010-5613-1935", textAlign: TextAlign.left, style: TextStyle(color: Colors.blue),),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -1256,7 +1287,7 @@ class Edit extends State<EditProfile> {
   Future<Map<String, dynamic>> _user() async {
     prefs = await SharedPreferences.getInstance();
     final response = await http.get (
-      "https://ip2019.tk/guide/api?token=" + prefs.getString("token"),
+      "https://sic2019.kr/guide/api?token=" + prefs.getString("token"),
       headers: {
         "content-type" : "application/json",
         "accept" : "application/json",
@@ -1267,7 +1298,7 @@ class Edit extends State<EditProfile> {
 
   Future<Init> fetchPost(String _token, String _guideName, String _guideNumber, String _busCode, String _busNumber) async {
     final response = await http.post (
-      "https://ip2019.tk/guide/api/info",
+      "https://sic2019.kr/guide/api/info",
       body: json.encode({
         "token" : _token,
         "bus_guide_name": _guideName,
@@ -1541,7 +1572,7 @@ class EditB extends State<EditBus> {
   Future<Map<String, dynamic>> _user() async {
     prefs = await SharedPreferences.getInstance();
     final response = await http.get (
-      "https://ip2019.tk/guide/api?token=" + prefs.getString("token"),
+      "https://sic2019.kr/guide/api?token=" + prefs.getString("token"),
       headers: {
         "content-type" : "application/json",
         "accept" : "application/json",
@@ -1552,7 +1583,7 @@ class EditB extends State<EditBus> {
 
   Future<Init> fetchPost(String _token, String _guideName, String _guideNumber, String _busCode, String _busNumber) async {
     final response = await http.post (
-      "https://ip2019.tk/guide/api/info",
+      "https://sic2019.kr/guide/api/info",
       body: json.encode({
         "token" : _token,
         "bus_guide_name": _guideName,
