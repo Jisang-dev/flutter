@@ -139,7 +139,7 @@ class _MyAppState extends State<Receive1App> with TickerProviderStateMixin {
           info = data['bus_info'];
         });
 
-        if (info['bus_driver_phone'] == null || info['bus_number'] == null || info['bus_driver_phone'].toString().length < 4 || info['bus_number'].toString().length < 7) {
+        if (info['bus_driver_phone'] == null || info['bus_number'] == null || info['bus_driver_phone'].toString().length < 7 || info['bus_number'].toString().length < 4) {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => EditBus(this)),
