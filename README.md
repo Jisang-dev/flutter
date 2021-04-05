@@ -1,4 +1,4 @@
-# flutter
+# 주차 관제 어플리케이션 프로젝트 (클라우드처럼 사용)
 flutter dart code lib
 
 main -> 초기 로그인 화면
